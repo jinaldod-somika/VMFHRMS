@@ -7,6 +7,12 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <!-- Stat buttons -->
+            <xpath expr="//header" position="inside">
+                <button name="%(action_vmf_performance_feedback_wizard)d" string="Provide Feedback" type="action"
+                        groups="vmf_hrms.group_vmf_manager"/>
+                <button name="%(action_vmf_pip_initiate_wizard)d" string="Initiate PIP" type="action"
+                        groups="vmf_hrms.group_vmf_hr_manager" class="btn-danger"/>
+            </xpath>
             <xpath expr="//div[@name='button_box']" position="inside">
                 <button name="action_view_travel_requests" type="object"
                         class="oe_stat_button" icon="fa-plane"
@@ -24,9 +30,18 @@
                     <span class="o_stat_text">Reviews</span>
                 </button>
             </xpath>
+            <xpath expr="//sheet" position="inside">
+                <widget name="web_ribbon" title="HIPO" bg_color="bg-success"
+                        invisible="not is_hipo"/>
+            </xpath>
             <!-- Employee number below name -->
             <xpath expr="//field[@name='name']" position="after">
                 <field name="vmf_employee_number" readonly="1"/>
+            </xpath>
+            <!-- Add HOD2 and Business HR after manager (parent_id) -->
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <field name="vmf_hod2_id"/>
+                <field name="vmf_business_hr_id"/>
             </xpath>
             <!-- VMG Details tab -->
             <xpath expr="//page[@name='hr_settings']" position="after">

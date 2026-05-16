@@ -144,7 +144,7 @@
     <record id="grade_m9" model="vmf.grade">
         <field name="name">M9</field>
         <field name="description">Management Grade 9 — Senior Director</field>
-        <field name="grade_level">management</field>
+        <field name="grade_level">senior_management</field>
         <field name="sequence">18</field>
         <field name="min_salary_usd">22000</field>
         <field name="max_salary_usd">32000</field>
@@ -152,7 +152,7 @@
     <record id="grade_m10" model="vmf.grade">
         <field name="name">M10</field>
         <field name="description">Management Grade 10 — Executive Director</field>
-        <field name="grade_level">management</field>
+        <field name="grade_level">senior_management</field>
         <field name="sequence">19</field>
         <field name="min_salary_usd">28000</field>
         <field name="max_salary_usd">40000</field>
@@ -160,7 +160,7 @@
     <record id="grade_m11" model="vmf.grade">
         <field name="name">M11</field>
         <field name="description">Management Grade 11 — C-Suite</field>
-        <field name="grade_level">management</field>
+        <field name="grade_level">senior_management</field>
         <field name="sequence">20</field>
         <field name="min_salary_usd">35000</field>
         <field name="max_salary_usd">55000</field>
@@ -168,7 +168,7 @@
     <record id="grade_m12" model="vmf.grade">
         <field name="name">M12</field>
         <field name="description">Management Grade 12 — Group Leadership</field>
-        <field name="grade_level">management</field>
+        <field name="grade_level">senior_management</field>
         <field name="sequence">21</field>
         <field name="min_salary_usd">50000</field>
         <field name="max_salary_usd">100000</field>

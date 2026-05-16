@@ -13,6 +13,12 @@
                 <field name="min_experience_years"/>
                 <field name="is_critical_role"/>
             </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning mb-0" role="alert"
+                     invisible="not succession_plan_warning">
+                    <field name="succession_plan_warning"/>
+                </div>
+            </xpath>
         </field>
     </record>
 
@@ -25,7 +31,23 @@
             <xpath expr="//field[@name='name']" position="after">
                 <field name="grade_id" optional="show"/>
                 <field name="job_level" optional="show"/>
-                <field name="is_critical_role" optional="hide"/>
+                <field name="is_critical_role" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search view extension for Critical Role filter -->
+    <record id="view_hr_job_search_vmf" model="ir.ui.view">
+        <field name="name">hr.job.search.vmf</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_job_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='message_needaction']" position="before">
+                <filter name="filter_critical" string="Critical Roles" domain="[('is_critical_role', '=', True)]"/>
+                <separator/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter name="group_job_level" string="Job Level" context="{'group_by': 'job_level'}"/>
             </xpath>
         </field>
     </record>

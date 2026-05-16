@@ -3,7 +3,6 @@ from odoo.tools.translate import _
 from datetime import date
 
 
-
 SOURCING_CHANNELS = [
     ('karmaa', 'Karmaa'),
     ('referral', 'Referral'),
@@ -74,23 +73,44 @@ class VmfCandidate(models.Model):
         ('joining_confirmed', 'Joining Confirmed'),
         ('joined', 'Joined'),
         ('offer_dropped', 'Offer Dropped'),
-        ('on_hold', 'On Hold'),
         ('rejected', 'Rejected'),
-    ], string='Stage', default='new', tracking=True)
+        ('on_hold', 'On Hold'),
+    ], string='Status', default='new', tracking=True)
+
+    previous_state = fields.Selection([
+        ('new', 'New'),
+        ('screening', 'Screening'),
+        ('interview_1', 'Interview 1'),
+        ('interview_2', 'Interview 2'),
+        ('interview_3', 'Interview 3'),
+        ('selected', 'Selected'),
+        ('offer_prepared', 'Offer Prepared'),
+        ('offer_released', 'Offer Released'),
+        ('offer_accepted', 'Offer Accepted'),
+        ('bgv', 'BGV / Medical / Visa'),
+        ('joining_confirmed', 'Joining Confirmed'),
+        ('joined', 'Joined'),
+        ('offer_dropped', 'Offer Dropped'),
+        ('rejected', 'Rejected'),
+        ('on_hold', 'On Hold'),
+    ], string='Previous Status')
+
+    hold_reason = fields.Text('Current Hold Reason')
+    drop_reason = fields.Text('Current Drop Reason')
 
     # Interview rounds
     interview1_date = fields.Date('Round 1 Date')
-    interview1_interviewer_id = fields.Many2one('hr.employee', string='Round 1 Interviewer')
+    interview1_interviewer_ids = fields.Many2many('hr.employee', 'cand_int1_rel', 'cand_id', 'emp_id', string='Round 1 Interviewers')
     interview1_result = fields.Selection(INTERVIEW_RESULTS, string='Round 1 Result')
     interview1_feedback = fields.Text('Round 1 Feedback')
 
     interview2_date = fields.Date('Round 2 Date')
-    interview2_interviewer_id = fields.Many2one('hr.employee', string='Round 2 Interviewer')
+    interview2_interviewer_ids = fields.Many2many('hr.employee', 'cand_int2_rel', 'cand_id', 'emp_id', string='Round 2 Interviewers')
     interview2_result = fields.Selection(INTERVIEW_RESULTS, string='Round 2 Result')
     interview2_feedback = fields.Text('Round 2 Feedback')
 
     interview3_date = fields.Date('Round 3 Date')
-    interview3_interviewer_id = fields.Many2one('hr.employee', string='Round 3 Interviewer')
+    interview3_interviewer_ids = fields.Many2many('hr.employee', 'cand_int3_rel', 'cand_id', 'emp_id', string='Round 3 Interviewers')
     interview3_result = fields.Selection(INTERVIEW_RESULTS, string='Round 3 Result')
     interview3_feedback = fields.Text('Round 3 Feedback')
 
@@ -105,7 +125,8 @@ class VmfCandidate(models.Model):
     offer_prepared_date = fields.Date('Offer Prepared Date')
     offer_released_date = fields.Date('Offer Released Date')
     offer_accepted_date = fields.Date('Offer Accepted Date')
-    offered_ctc = fields.Float('Offered CTC')
+    current_ctc = fields.Monetary('Current CTC', currency_field='offer_currency_id')
+    offered_ctc = fields.Monetary('Offered CTC', currency_field='offer_currency_id')
     offer_currency_id = fields.Many2one('res.currency', string='Offer Currency',
                                         default=lambda self: self.env.company.currency_id)
 
@@ -164,6 +185,9 @@ class VmfCandidate(models.Model):
     # Notes
     notes = fields.Text('Notes')
 
+    # Documents
+    candidate_document_ids = fields.Many2many('ir.attachment', 'cand_doc_rel', 'cand_id', 'attach_id', string='Documents')
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -190,12 +214,30 @@ class VmfCandidate(models.Model):
 
     def action_schedule_interview1(self):
         self.write({'state': 'interview_1'})
+        return self._action_open_calendar_event(_('Round 1 Interview'))
 
     def action_schedule_interview2(self):
         self.write({'state': 'interview_2'})
+        return self._action_open_calendar_event(_('Round 2 Interview'))
 
     def action_schedule_interview3(self):
         self.write({'state': 'interview_3'})
+        return self._action_open_calendar_event(_('Round 3 Interview'))
+
+    def _action_open_calendar_event(self, meeting_name):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Schedule Interview'),
+            'res_model': 'calendar.event',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_name': f"{meeting_name}: {self.candidate_name}",
+                'default_description': f"Interview for {self.job_id.name} ({self.name})",
+                'default_partner_ids': [self.env.user.partner_id.id],
+            }
+        }
 
     def action_select(self):
         self.write({'state': 'selected'})
@@ -272,6 +314,23 @@ class VmfCandidateDrop(models.Model):
         ('visa_rejected', 'Visa Rejected'),
     ], string='Drop Stage', required=True)
     drop_reason = fields.Text('Drop Reason', required=True)
+    previous_state = fields.Selection([
+        ('new', 'New'),
+        ('screening', 'Screening'),
+        ('interview_1', 'Interview 1'),
+        ('interview_2', 'Interview 2'),
+        ('interview_3', 'Interview 3'),
+        ('selected', 'Selected'),
+        ('offer_prepared', 'Offer Prepared'),
+        ('offer_released', 'Offer Released'),
+        ('offer_accepted', 'Offer Accepted'),
+        ('bgv', 'BGV / Medical / Visa'),
+        ('joining_confirmed', 'Joining Confirmed'),
+        ('joined', 'Joined'),
+        ('offer_dropped', 'Offer Dropped'),
+        ('rejected', 'Rejected'),
+        ('on_hold', 'On Hold'),
+    ], string='Previous Status')
     days_lost = fields.Integer('Days Lost', compute='_compute_days_lost', store=True)
     reinstated = fields.Boolean('Reinstated / Reconsidered')
     notes = fields.Text('Notes')
@@ -294,6 +353,24 @@ class VmfCandidateHold(models.Model):
     hold_start = fields.Date('Hold Start', required=True, default=fields.Date.today)
     hold_end = fields.Date('Hold End')
     hold_reason = fields.Text('Hold Reason', required=True)
+    reopen_reason = fields.Text('Reopen Reason')
+    previous_state = fields.Selection([
+        ('new', 'New'),
+        ('screening', 'Screening'),
+        ('interview_1', 'Interview 1'),
+        ('interview_2', 'Interview 2'),
+        ('interview_3', 'Interview 3'),
+        ('selected', 'Selected'),
+        ('offer_prepared', 'Offer Prepared'),
+        ('offer_released', 'Offer Released'),
+        ('offer_accepted', 'Offer Accepted'),
+        ('bgv', 'BGV / Medical / Visa'),
+        ('joining_confirmed', 'Joining Confirmed'),
+        ('joined', 'Joined'),
+        ('offer_dropped', 'Offer Dropped'),
+        ('rejected', 'Rejected'),
+        ('on_hold', 'On Hold'),
+    ], string='Previous Status')
     hold_days = fields.Integer('Hold Days', compute='_compute_hold_days', store=True)
 
     @api.depends('hold_start', 'hold_end')

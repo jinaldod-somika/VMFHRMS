@@ -280,14 +280,16 @@
         <field name="arch" type="xml">
             <form string="Talent Review">
                 <header>
+                    <button name="action_submit" string="Submit for Review" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
                     <button name="action_calibrate" string="Calibrate" type="object"
-                            invisible="state != 'draft'" class="btn-primary"
+                            invisible="state != 'submitted'" class="btn-primary"
                             groups="vmf_hrms.group_vmf_hr_manager"/>
                     <button name="action_confirm" string="Confirm" type="object"
                             invisible="state != 'calibrated'" class="btn-success"
                             groups="vmf_hrms.group_vmf_group_hr"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,calibrated,confirmed"/>
+                           statusbar_visible="draft,submitted,calibrated,active"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="HIPO" bg_color="bg-success"
@@ -364,6 +366,18 @@
         </field>
     </record>
 
+    <record id="view_vmf_talent_review_pivot" model="ir.ui.view">
+        <field name="name">vmf.talent.review.pivot</field>
+        <field name="model">vmf.talent.review</field>
+        <field name="arch" type="xml">
+            <pivot string="Talent Analysis (9-Box)">
+                <field name="nine_box_position" type="row"/>
+                <field name="review_year" type="col"/>
+                <field name="employee_id" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
     <record id="view_vmf_talent_review_search" model="ir.ui.view">
         <field name="name">vmf.talent.review.search</field>
         <field name="model">vmf.talent.review</field>
@@ -375,7 +389,7 @@
                 <filter name="filter_hipo" string="HIPO Only" domain="[('is_hipo','=',True)]"/>
                 <filter name="filter_high_risk" string="High Retention Risk"
                         domain="[('retention_risk','=','high')]"/>
-                <filter name="filter_confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
+                <filter name="filter_active" string="Active" domain="[('state','=','active')]"/>
                 <group>
                     <filter name="group_box" string="9-Box Position" context="{'group_by': 'nine_box_position'}"/>
                     <filter name="group_year" string="Review Year" context="{'group_by': 'review_year'}"/>
@@ -388,7 +402,7 @@
     <record id="action_vmf_talent_review" model="ir.actions.act_window">
         <field name="name">Talent Reviews (9-Box)</field>
         <field name="res_model">vmf.talent.review</field>
-        <field name="view_mode">kanban,list,form</field>
+        <field name="view_mode">kanban,list,pivot,form</field>
         <field name="search_view_id" ref="view_vmf_talent_review_search"/>
     </record>
 
@@ -440,6 +454,7 @@
                         <group>
                             <field name="review_year"/>
                             <field name="last_reviewed"/>
+                            <field name="idp_id"/>
                             <field name="successor_count" readonly="1"/>
                             <field name="ready_now_count" readonly="1"/>
                         </group>
@@ -509,7 +524,7 @@
                 <field name="current_level"/>
                 <field name="gap"/>
                 <field name="is_critical"/>
-                <field name="recommended_action"/>
+                <field name="state" widget="badge"/>
                 <field name="assessment_date"/>
             </list>
         </field>
@@ -520,6 +535,14 @@
         <field name="model">vmf.skill.gap</field>
         <field name="arch" type="xml">
             <form string="Skill Gap">
+                <header>
+                    <button name="action_assess" string="Submit Assessment" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_verify" string="Verify" type="object"
+                            invisible="state != 'assessed'" class="btn-success"
+                            groups="vmf_hrms.group_vmf_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,assessed,verified"/>
+                </header>
                 <sheet>
                     <group>
                         <group>

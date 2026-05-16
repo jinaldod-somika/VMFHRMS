@@ -78,6 +78,21 @@ class VmfMRF(models.Model):
         ('on_hold', 'On Hold'),
     ], string='Status', default='draft', tracking=True)
 
+    previous_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('dept_approved', 'Dept. Manager Approved'),
+        ('hr_approved', 'BU HR Approved'),
+        ('group_hr_approved', 'Group HR Approved'),
+        ('budget_approved', 'Budget Approved / Open'),
+        ('in_progress', 'In Progress'),
+        ('filled', 'Filled'),
+        ('cancelled', 'Cancelled'),
+        ('on_hold', 'On Hold'),
+    ], string='Previous Status', help='Stores the state before putting on hold')
+
+    hold_reason = fields.Text('Current Hold Reason')
+
     date_submitted = fields.Date('Date Submitted', readonly=True)
     date_dept_approved = fields.Date('Dept. Approved Date', readonly=True)
     date_hr_approved = fields.Date('HR Approved Date', readonly=True)
@@ -179,8 +194,14 @@ class VmfMRF(models.Model):
 
     def action_reopen(self):
         self.ensure_one()
-        self.write({'state': 'budget_approved'})
-        self.message_post(body=_('Position reopened.'))
+        state_to_restore = self.previous_state or 'budget_approved'
+        self.write({'state': state_to_restore})
+        self.message_post(body=_('Position reopened to state: %s') % state_to_restore)
+
+    def action_filled(self):
+        self.ensure_one()
+        self.write({'state': 'filled'})
+        self.message_post(body=_('MRF marked as filled/closed.'))
 
     def action_view_candidates(self):
         return {
@@ -202,6 +223,19 @@ class VmfMRFHold(models.Model):
     hold_start_date = fields.Date('Hold Start Date', required=True, default=fields.Date.today)
     hold_end_date = fields.Date('Hold End Date')
     hold_reason = fields.Text('Hold Reason', required=True)
+    reopen_reason = fields.Text('Reopen Reason')
+    previous_state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('dept_approved', 'Dept. Manager Approved'),
+        ('hr_approved', 'BU HR Approved'),
+        ('group_hr_approved', 'Group HR Approved'),
+        ('budget_approved', 'Budget Approved / Open'),
+        ('in_progress', 'In Progress'),
+        ('filled', 'Filled'),
+        ('cancelled', 'Cancelled'),
+        ('on_hold', 'On Hold'),
+    ], string='Previous Status')
     hold_days = fields.Integer('Hold Days', compute='_compute_hold_days', store=True)
     resumed_by = fields.Many2one('res.users', string='Resumed By')
 

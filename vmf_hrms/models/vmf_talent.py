@@ -249,8 +249,9 @@ class VmfTalentReview(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
+        ('submitted', 'Submitted for Review'),
         ('calibrated', 'Calibrated'),
-        ('confirmed', 'Confirmed'),
+        ('active', 'Active / Confirmed'),
     ], string='Status', default='draft', tracking=True)
 
     @api.depends('employee_id', 'review_year')
@@ -280,12 +281,26 @@ class VmfTalentReview(models.Model):
         for rec in self:
             rec.is_hipo = rec.nine_box_position in ('8', '9')
 
+    def action_submit(self):
+        self.write({'state': 'submitted'})
+        self._notify_talent_review(_('Talent review submitted for calibration.'))
+
     def action_calibrate(self):
         self.write({'state': 'calibrated'})
 
     def action_confirm(self):
-        self.write({'state': 'confirmed'})
-        self.message_post(body=_('Talent review confirmed.'))
+        self.write({'state': 'active'})
+        self._notify_talent_review(_('Talent review confirmed and finalized.'))
+
+    def _notify_talent_review(self, message_prefix):
+        for rec in self:
+            rec.message_post(body=f"<b>{message_prefix}</b><br/>Employee: {rec.employee_id.name}<br/>Review Year: {rec.review_year}")
+            # Notify Manager
+            if rec.employee_id.parent_id and rec.employee_id.parent_id.user_id:
+                rec.message_post(body=f"Talent Notification: {rec.name} updated.", partner_ids=[rec.employee_id.parent_id.user_id.partner_id.id])
+            # Notify HR Coach
+            if rec.employee_id.vmf_business_hr_id and rec.employee_id.vmf_business_hr_id.user_id:
+                rec.message_post(body=f"Talent Notification: {rec.name} updated.", partner_ids=[rec.employee_id.vmf_business_hr_id.user_id.partner_id.id])
 
 
 class VmfSuccessionPlan(models.Model):
@@ -316,6 +331,7 @@ class VmfSuccessionPlan(models.Model):
 
     review_year = fields.Integer('Review Year', default=lambda self: date.today().year)
     last_reviewed = fields.Date('Last Reviewed', default=fields.Date.today)
+    idp_id = fields.Many2one('vmf.idp', string='Linked IDP', help='Individual Development Plan for the successor pool.')
     state = fields.Selection([
         ('draft', 'Draft'),
         ('active', 'Active'),
@@ -461,6 +477,17 @@ class VmfSkillGap(models.Model):
     is_critical = fields.Boolean('Critical Competency')
     recommended_action = fields.Text('Recommended Action')
     assessment_date = fields.Date('Assessed On', default=fields.Date.today)
+    state = fields.Selection([
+        ('draft', 'To be Assessed'),
+        ('assessed', 'Assessed'),
+        ('verified', 'Verified'),
+    ], string='Status', default='draft', tracking=True)
+
+    def action_assess(self):
+        self.write({'state': 'assessed', 'assessment_date': fields.Date.today()})
+
+    def action_verify(self):
+        self.write({'state': 'verified'})
 
     @api.depends('required_level', 'current_level')
     def _compute_gap(self):

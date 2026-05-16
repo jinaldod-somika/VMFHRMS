@@ -25,7 +25,16 @@
         <field name="name">vmf.course.form</field>
         <field name="model">vmf.course</field>
         <field name="arch" type="xml">
-            <form string="Course">
+            <form string="Training Course">
+                <header>
+                    <button name="action_publish" string="Publish" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_retire" string="Retire" type="object"
+                            invisible="state != 'published'"/>
+                    <button name="action_draft" string="Reset to Draft" type="object"
+                            invisible="state != 'retired'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published,retired"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_assignments" type="object"
@@ -144,6 +153,10 @@
         <field name="model">vmf.learning.path</field>
         <field name="arch" type="xml">
             <list string="Learning Paths">
+                <header>
+                    <button name="%(action_vmf_bulk_course_assignment_wizard)d" 
+                            string="Bulk Assign Path" type="action" class="btn-primary"/>
+                </header>
                 <field name="code"/>
                 <field name="name"/>
                 <field name="target_audience"/>
@@ -250,6 +263,8 @@
                     <button name="action_reset" string="Reset" type="object"
                             invisible="state not in ['failed','cancelled']"
                             groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="%(action_vmf_course_feedback_wizard)d" string="Training Feedback" type="action"
+                            invisible="state != 'completed'"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="assigned,in_progress,completed"/>
                 </header>

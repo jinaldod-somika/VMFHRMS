@@ -15,6 +15,21 @@ access_vmf_mrf_recruiter,vmf.mrf recruiter,vmf_hrms.model_vmf_mrf,group_vmf_recr
 access_vmf_mrf_manager,vmf.mrf manager,vmf_hrms.model_vmf_mrf,group_vmf_manager,1,0,0,0
 access_vmf_mrf_hold_hr,vmf.mrf.hold hr,vmf_hrms.model_vmf_mrf_hold,group_vmf_hr_manager,1,1,1,1
 access_vmf_mrf_hold_recruiter,vmf.mrf.hold recruiter,vmf_hrms.model_vmf_mrf_hold,group_vmf_recruiter,1,1,1,0
+access_vmf_mrf_hold_wizard,vmf.mrf.hold.wizard,vmf_hrms.model_vmf_mrf_hold_wizard,base.group_user,1,1,1,1
+access_vmf_mrf_drop_wizard,vmf.mrf.drop.wizard,vmf_hrms.model_vmf_mrf_drop_wizard,base.group_user,1,1,1,1
+access_vmf_mrf_reopen_wizard,vmf.mrf.reopen.wizard,vmf_hrms.model_vmf_mrf_reopen_wizard,base.group_user,1,1,1,1
+access_vmf_candidate_hold_wizard,vmf.candidate.hold.wizard,vmf_hrms.model_vmf_candidate_hold_wizard,base.group_user,1,1,1,1
+access_vmf_candidate_drop_wizard,vmf.candidate.drop.wizard,vmf_hrms.model_vmf_candidate_drop_wizard,base.group_user,1,1,1,1
+access_vmf_candidate_medical_wizard,vmf.candidate.medical.wizard,vmf_hrms.model_vmf_candidate_medical_wizard,base.group_user,1,1,1,1
+access_vmf_candidate_bgv_wizard,vmf.candidate.bgv.wizard,vmf_hrms.model_vmf_candidate_bgv_wizard,base.group_user,1,1,1,1
+access_vmf_candidate_visa_wizard,vmf.candidate.visa.wizard,vmf_hrms.model_vmf_candidate_visa_wizard,base.group_user,1,1,1,1
+access_vmf_candidate_reopen_wizard,vmf.candidate.reopen.wizard,vmf_hrms.model_vmf_candidate_reopen_wizard,base.group_user,1,1,1,1
+access_vmf_exit_interview_wizard,vmf.exit.interview.wizard,vmf_hrms.model_vmf_exit_interview_wizard,base.group_user,1,1,1,1
+access_vmf_course_feedback_wizard,vmf.course.feedback.wizard,vmf_hrms.model_vmf_course_feedback_wizard,base.group_user,1,1,1,1
+access_vmf_performance_feedback_wizard,vmf.performance.feedback.wizard,vmf_hrms.model_vmf_performance_feedback_wizard,base.group_user,1,1,1,1
+access_vmf_bulk_course_assignment_wizard,vmf.bulk.course.assignment.wizard,vmf_hrms.model_vmf_bulk_course_assignment_wizard,base.group_user,1,1,1,1
+access_vmf_self_appraisal_wizard,vmf.self.appraisal.wizard,vmf_hrms.model_vmf_self_appraisal_wizard,base.group_user,1,1,1,1
+access_vmf_pip_initiate_wizard,vmf.pip.initiate.wizard,vmf_hrms.model_vmf_pip_initiate_wizard,base.group_user,1,1,1,1
 access_vmf_candidate_recruiter,vmf.candidate recruiter,vmf_hrms.model_vmf_candidate,group_vmf_recruiter,1,1,1,0
 access_vmf_candidate_hr,vmf.candidate hr,vmf_hrms.model_vmf_candidate,group_vmf_hr_manager,1,1,1,0
 access_vmf_candidate_drop_recruiter,vmf.candidate.drop recruiter,vmf_hrms.model_vmf_candidate_drop,group_vmf_recruiter,1,1,1,0
@@ -93,3 +108,25 @@ access_vmf_successor_line_hr,vmf.successor.line hr,vmf_hrms.model_vmf_successor_
 access_vmf_successor_line_group,vmf.successor.line group hr,vmf_hrms.model_vmf_successor_line,group_vmf_group_hr,1,1,1,1
 access_vmf_skill_gap_hr,vmf.skill.gap hr,vmf_hrms.model_vmf_skill_gap,group_vmf_hr_manager,1,1,1,1
 access_vmf_skill_gap_employee,vmf.skill.gap employee,vmf_hrms.model_vmf_skill_gap,group_vmf_employee,1,0,0,0
+access_vmf_grade_auditor,vmf.grade auditor,vmf_hrms.model_vmf_grade,group_vmf_auditor,1,0,0,0
+access_vmf_cost_center_auditor,vmf.cost.center auditor,vmf_hrms.model_vmf_cost_center,group_vmf_auditor,1,0,0,0
+access_vmf_business_unit_auditor,vmf.business.unit auditor,vmf_hrms.model_vmf_business_unit,group_vmf_auditor,1,0,0,0
+access_vmf_region_auditor,vmf.region auditor,vmf_hrms.model_vmf_region,group_vmf_auditor,1,0,0,0
+access_vmf_mrf_auditor,vmf.mrf auditor,vmf_hrms.model_vmf_mrf,group_vmf_auditor,1,0,0,0
+access_vmf_candidate_auditor,vmf.candidate auditor,vmf_hrms.model_vmf_candidate,group_vmf_auditor,1,0,0,0
+access_vmf_employee_contract_auditor,vmf.employee.contract auditor,vmf_hrms.model_vmf_employee_contract,group_vmf_auditor,1,0,0,0
+access_vmf_payslip_auditor,vmf.payslip auditor,vmf_hrms.model_vmf_payslip,group_vmf_auditor,1,0,0,0
+access_vmf_travel_request_auditor,vmf.travel.request auditor,vmf_hrms.model_vmf_travel_request,group_vmf_auditor,1,0,0,0
+access_vmf_exit_request_auditor,vmf.exit.request auditor,vmf_hrms.model_vmf_exit_request,group_vmf_auditor,1,0,0,0
+access_vmf_performance_review_auditor,vmf.performance.review auditor,vmf_hrms.model_vmf_performance_review,group_vmf_auditor,1,0,0,0
+access_vmf_idp_auditor,vmf.idp auditor,vmf_hrms.model_vmf_idp,group_vmf_auditor,1,0,0,0
+access_vmf_talent_review_auditor,vmf.talent.review auditor,vmf_hrms.model_vmf_talent_review,group_vmf_auditor,1,0,0,0
+access_vmf_succession_plan_auditor,vmf.succession.plan auditor,vmf_hrms.model_vmf_succession_plan,group_vmf_auditor,1,0,0,0
+access_hr_employee_auditor,hr.employee auditor,hr.model_hr_employee,group_vmf_auditor,1,0,0,0
+access_hr_version_auditor,hr.version auditor,hr.model_hr_version,group_vmf_auditor,1,0,0,0
+access_hr_leave_auditor,hr.leave auditor,hr_holidays.model_hr_leave,group_vmf_auditor,1,0,0,0
+access_hr_leave_type_auditor,hr.leave.type auditor,hr_holidays.model_hr_leave_type,group_vmf_auditor,1,0,0,0
+access_hr_leave_allocation_auditor,hr.leave.allocation auditor,hr_holidays.model_hr_leave_allocation,group_vmf_auditor,1,0,0,0
+access_hr_job_auditor,hr.job auditor,hr.model_hr_job,group_vmf_auditor,1,0,0,0
+access_hr_department_auditor,hr.department auditor,hr.model_hr_department,group_vmf_auditor,1,0,0,0
+access_hr_work_location_auditor,hr.work.location auditor,hr.model_hr_work_location,group_vmf_auditor,1,0,0,0

@@ -1,10 +1,24 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
+import re
 
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
+
+    # Overriding base fields to grant read access to Auditor
+    # Note: These fields are originally restricted to hr_holidays.group_hr_holidays_user
+    # Overriding base fields to grant read access to Auditor
+    # Note: These fields are originally restricted to hr_holidays.group_hr_holidays_user and hr.group_hr_user
+    current_leave_id = fields.Many2one('hr.leave.type', groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
+    current_leave_state = fields.Selection(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
+    leave_date_from = fields.Date(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
+    leave_date_to = fields.Date(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
+    is_absent = fields.Boolean(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
+
+    # Overriding standard field to remove group restriction (allows users like k k to read it)
+    exceptional_location_id = fields.Many2one('hr.work.location', groups=False)
 
     # Employee number sequence
     vmf_employee_number = fields.Char('Employee Number', copy=False, readonly=True)
@@ -27,6 +41,8 @@ class HrEmployee(models.Model):
     vmf_business_unit_id = fields.Many2one('vmf.business.unit', string='Business Unit')
     vmf_cost_center_id = fields.Many2one('vmf.cost.center', string='Cost Center')
     vmf_region_id = fields.Many2one('vmf.region', string='Region')
+    vmf_hod2_id = fields.Many2one('hr.employee', string='HOD 2')
+    vmf_business_hr_id = fields.Many2one('hr.employee', string='Business HR')
 
     # Address
     vmf_permanent_address = fields.Text('Permanent Address')
@@ -58,11 +74,32 @@ class HrEmployee(models.Model):
     vmf_french_eligible = fields.Boolean('French Language Allowance Eligible')
 
     # India statutory — visible to HR Manager and above (Payroll inherits HR Manager)
-    vmf_pan_number = fields.Char('PAN Number', groups='vmf_hrms.group_vmf_hr_manager')
-    vmf_aadhar_number = fields.Char('Aadhar Number', groups='vmf_hrms.group_vmf_hr_manager')
-    vmf_uan_number = fields.Char('UAN (PF) Number', groups='vmf_hrms.group_vmf_hr_manager')
-    vmf_pf_account = fields.Char('PF Account Number', groups='vmf_hrms.group_vmf_hr_manager')
-    vmf_esi_number = fields.Char('ESI Number', groups='vmf_hrms.group_vmf_hr_manager')
+    vmf_pan_number = fields.Char('PAN Number', groups='vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_auditor')
+    vmf_aadhar_number = fields.Char('Aadhar Number', groups='vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_auditor')
+    vmf_uan_number = fields.Char('UAN (PF) Number', groups='vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_auditor')
+    vmf_pf_account = fields.Char('PF Account Number', groups='vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_auditor')
+    vmf_esi_number = fields.Char('ESI Number', groups='vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_auditor')
+
+    @api.constrains('vmf_pan_number')
+    def _check_pan_number(self):
+        for rec in self:
+            if rec.vmf_pan_number:
+                if not re.match(r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$', rec.vmf_pan_number):
+                    raise ValidationError(_("Invalid PAN Number format. It must be 10 characters (e.g., ABCDE1234F)."))
+
+    @api.constrains('vmf_aadhar_number')
+    def _check_aadhar_number(self):
+        for rec in self:
+            if rec.vmf_aadhar_number:
+                if not re.match(r'^\d{12}$', rec.vmf_aadhar_number):
+                    raise ValidationError(_("Invalid Aadhaar Number. It must be exactly 12 digits."))
+
+    @api.constrains('vmf_uan_number')
+    def _check_uan_number(self):
+        for rec in self:
+            if rec.vmf_uan_number:
+                if not re.match(r'^\d{12}$', rec.vmf_uan_number):
+                    raise ValidationError(_("Invalid UAN Number. It must be exactly 12 digits."))
 
     # Employment dates
     vmf_probation_end_date = fields.Date('Probation End Date')
@@ -96,7 +133,7 @@ class HrEmployee(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if not vals.get('vmf_employee_number'):
-                category = vals.get('vmf_employee_category', '')
+                category = vals.get('vmf_employee_category') or ''
                 if 'expat' in category:
                     seq_code = 'vmf.employee.expat'
                 elif 'subcontractor' in category:

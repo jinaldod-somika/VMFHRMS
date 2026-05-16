@@ -131,6 +131,12 @@ class VmfExitRequest(models.Model):
         self.write({'state': 'ff_approved'})
 
     def action_complete(self):
+        self.ensure_one()
+        # Mark all clearances as cleared
+        self.clearance_ids.write({
+            'status': 'cleared',
+            'cleared_date': fields.Date.today()
+        })
         self.write({'state': 'completed'})
         # Archive employee
         self.employee_id.write({
@@ -161,7 +167,7 @@ class VmfExitClearance(models.Model):
     currency_id = fields.Many2one('res.currency', default=lambda self: self.env.company.currency_id)
 
     def action_clear(self):
-        self.write({'status': 'cleared', 'cleared_date': date.today()})
+        self.write({'status': 'cleared', 'cleared_date': fields.Date.today()})
 
 
 class VmfFFSettlement(models.Model):

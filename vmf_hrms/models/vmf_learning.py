@@ -1,25 +1,30 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
 
 
 class VmfCourse(models.Model):
     _name = 'vmf.course'
-    _description = 'Learning Course'
-    _inherit = ['mail.thread']
-    _order = 'category, name'
+    _description = 'Training Course'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _rec_name = 'name'
+    _order = 'name'
 
     name = fields.Char('Course Name', required=True, tracking=True)
     code = fields.Char('Course Code', readonly=True, copy=False, default='New')
     description = fields.Html('Description')
     category = fields.Selection([
-        ('technical', 'Technical / Functional'),
-        ('behavioral', 'Behavioral / Soft Skills'),
+        ('technical', 'Technical'),
+        ('soft_skills', 'Soft Skills'),
+        ('compliance', 'Compliance / Safety'),
         ('leadership', 'Leadership'),
-        ('compliance', 'Compliance / Statutory'),
-        ('safety', 'Safety / EHS'),
-        ('induction', 'Induction / Onboarding'),
+        ('onboarding', 'Onboarding'),
     ], string='Category', required=True, default='technical', tracking=True)
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+        ('retired', 'Retired'),
+    ], string='Status', default='draft', tracking=True)
     delivery_mode = fields.Selection([
         ('classroom', 'Classroom / Instructor-Led'),
         ('elearning', 'E-Learning / Self-Paced'),
@@ -76,11 +81,20 @@ class VmfCourse(models.Model):
             'context': {'default_course_id': self.id},
         }
 
+    def action_publish(self):
+        self.write({'state': 'published'})
+
+    def action_retire(self):
+        self.write({'state': 'retired'})
+
+    def action_draft(self):
+        self.write({'state': 'draft'})
+
 
 class VmfLearningPath(models.Model):
     _name = 'vmf.learning.path'
     _description = 'Learning Path'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
 
     name = fields.Char('Learning Path Name', required=True, tracking=True)
@@ -131,7 +145,8 @@ class VmfLearningPathLine(models.Model):
     learning_path_id = fields.Many2one('vmf.learning.path', string='Learning Path',
         required=True, ondelete='cascade')
     sequence = fields.Integer('Sequence', default=10)
-    course_id = fields.Many2one('vmf.course', string='Course', required=True)
+    course_id = fields.Many2one('vmf.course', string='Course', required=True, 
+        domain="[('active', '=', True), ('state', '=', 'published')]")
     is_required = fields.Boolean('Required', default=True)
     duration_hours = fields.Float(related='course_id.duration_hours', string='Duration')
     category = fields.Selection(related='course_id.category', string='Category')
@@ -148,9 +163,11 @@ class VmfCourseAssignment(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, tracking=True)
     department_id = fields.Many2one('hr.department', related='employee_id.department_id', store=True)
     company_id = fields.Many2one('res.company', related='employee_id.company_id', store=True)
-    course_id = fields.Many2one('vmf.course', string='Course', required=True, tracking=True)
+    course_id = fields.Many2one('vmf.course', string='Course', required=True, tracking=True,
+        domain="[('active', '=', True), ('state', '=', 'published')]")
     course_category = fields.Selection(related='course_id.category', store=True)
-    learning_path_id = fields.Many2one('vmf.learning.path', string='Learning Path')
+    learning_path_id = fields.Many2one('vmf.learning.path', string='Learning Path',
+        domain="[('active', '=', True)]")
     idp_action_id = fields.Many2one('vmf.idp.action', string='IDP Action',
         help='Course assigned as part of an Individual Development Plan action.')
     assigned_by = fields.Many2one('res.users', string='Assigned By',

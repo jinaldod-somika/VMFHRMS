@@ -20,12 +20,21 @@
                     <button name="action_budget_approve" string="Budget Approve / Open" type="object"
                             invisible="state != 'group_hr_approved'"
                             groups="vmf_hrms.group_vmf_group_hr"/>
-                    <button name="action_hold" string="Put On Hold" type="object"
-                            invisible="state not in ['budget_approved','in_progress']"/>
-                    <button name="action_reopen" string="Reopen" type="object"
-                            invisible="state != 'on_hold'"/>
-                    <button name="action_cancel" string="Cancel" type="object"
-                            invisible="state in ['cancelled','filled']"/>
+                    <button name="action_set_in_progress" string="Start Recruitment" type="object"
+                            invisible="state != 'budget_approved'" class="btn-primary"
+                            groups="vmf_hrms.group_vmf_recruiter"/>
+                    <button name="action_filled" string="Mark as Filled" type="object"
+                            invisible="state != 'in_progress'" class="btn-success"
+                            groups="vmf_hrms.group_vmf_recruiter"/>
+                    <button name="%(action_vmf_mrf_hold_wizard)d" string="Put On Hold" type="action"
+                            invisible="state not in ['budget_approved','in_progress']"
+                            class="btn-warning"/>
+                    <button name="%(action_vmf_mrf_reopen_wizard)d" string="Reopen" type="action"
+                            invisible="state != 'on_hold'"
+                            class="btn-success"/>
+                    <button name="%(action_vmf_mrf_drop_wizard)d" string="Cancel / Drop" type="action"
+                            invisible="state in ['cancelled','filled']"
+                            class="btn-danger"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submitted,dept_approved,hr_approved,group_hr_approved,budget_approved,in_progress,filled"/>
                 </header>
@@ -94,7 +103,9 @@
                                 <list editable="bottom">
                                     <field name="hold_start_date"/>
                                     <field name="hold_end_date"/>
+                                    <field name="previous_state"/>
                                     <field name="hold_reason"/>
+                                    <field name="reopen_reason"/>
                                     <field name="hold_days"/>
                                     <field name="resumed_by"/>
                                 </list>
@@ -136,6 +147,8 @@
                 <field name="no_of_positions"/>
                 <field name="open_positions"/>
                 <field name="hiring_manager_id"/>
+                <field name="previous_state" decoration-info="True"/>
+                <field name="hold_reason"/>
                 <field name="state" widget="badge"
                        decoration-success="state in ['budget_approved','filled']"
                        decoration-warning="state in ['submitted','dept_approved','hr_approved','group_hr_approved']"

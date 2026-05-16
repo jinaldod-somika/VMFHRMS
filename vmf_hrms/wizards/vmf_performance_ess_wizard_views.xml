@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Performance Feedback Wizard -->
+    <record id="view_vmf_performance_feedback_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.performance.feedback.wizard.form</field>
+        <field name="model">vmf.performance.feedback.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Provide Feedback">
+                <sheet>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="feedback_type"/>
+                        <field name="subject"/>
+                        <field name="message"/>
+                        <field name="anonymous"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_submit_feedback" string="Submit Feedback" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_performance_feedback_wizard" model="ir.actions.act_window">
+        <field name="name">Provide Feedback</field>
+        <field name="res_model">vmf.performance.feedback.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_employee_id': active_id}</field>
+    </record>
+
+    <!-- Self Appraisal Wizard -->
+    <record id="view_vmf_self_appraisal_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.self.appraisal.wizard.form</field>
+        <field name="model">vmf.self.appraisal.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Self Appraisal">
+                <sheet>
+                    <group>
+                        <field name="review_id"/>
+                        <field name="self_rating"/>
+                        <field name="achievements"/>
+                        <field name="challenges"/>
+                        <field name="learning_needs"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_submit_self_appraisal" string="Submit Appraisal" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_self_appraisal_wizard" model="ir.actions.act_window">
+        <field name="name">Submit Self Appraisal</field>
+        <field name="res_model">vmf.self.appraisal.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_review_id': active_id}</field>
+    </record>
+
+    <!-- PIP Initiation Wizard -->
+    <record id="view_vmf_pip_initiate_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.pip.initiate.wizard.form</field>
+        <field name="model">vmf.pip.initiate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Initiate PIP">
+                <sheet>
+                    <group>
+                        <field name="employee_id"/>
+                        <field name="start_date"/>
+                        <field name="duration_weeks"/>
+                    </group>
+                    <group>
+                        <field name="improvement_areas"/>
+                        <field name="expected_outcomes"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_pip" string="Initiate PIP" type="object" class="btn-danger"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_pip_initiate_wizard" model="ir.actions.act_window">
+        <field name="name">Initiate PIP</field>
+        <field name="res_model">vmf.pip.initiate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_employee_id': active_id}</field>
+    </record>
+</odoo>

@@ -9,7 +9,7 @@ class VmfSalaryStructure(models.Model):
     _order = 'name'
 
     name = fields.Char('Structure Name', required=True)
-    code = fields.Char('Code', required=True)
+    code = fields.Char('Code', required=True, copy=False)
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', string='Currency', required=True,
                                    default=lambda self: self.env.company.currency_id)
@@ -35,7 +35,7 @@ class VmfSalaryRule(models.Model):
     structure_id = fields.Many2one('vmf.salary.structure', string='Structure', required=True, ondelete='cascade')
     sequence = fields.Integer('Sequence', default=10)
     name = fields.Char('Component Name', required=True)
-    code = fields.Char('Code', required=True)
+    code = fields.Char('Code', required=True, copy=False)
     component_type = fields.Selection([
         ('earning', 'Earning'),
         ('deduction', 'Deduction'),
@@ -61,7 +61,7 @@ class VmfEmployeeContract(models.Model):
     _order = 'date_start desc'
     _rec_name = 'name'
 
-    name = fields.Char('Contract Reference', required=True, default='New Contract')
+    name = fields.Char('Contract Reference', required=True, default='New Contract', copy=False)
     employee_id = fields.Many2one('hr.employee', string='Employee', required=True, tracking=True)
     company_id = fields.Many2one('res.company', related='employee_id.company_id', store=True)
     department_id = fields.Many2one('hr.department', related='employee_id.department_id', store=True)

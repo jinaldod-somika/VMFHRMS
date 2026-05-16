@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend res.partner.bank form view to add IFSC code -->
+    <record id="view_partner_bank_form_vmf_ext" model="ir.ui.view">
+        <field name="name">res.partner.bank.vmf.ext</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <!-- Insert IFSC code field after bank_id if it exists, else at the end of the form -->
+            <xpath expr="//field[@name='bank_id']" position="after">
+                <field name="vmf_ifsc_code"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Also extend the tree view to show the IFSC code -->
+    <record id="view_partner_bank_tree_vmf_ext" model="ir.ui.view">
+        <field name="name">res.partner.bank.tree.vmf.ext</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bank_name']" position="after">
+                <field name="vmf_ifsc_code" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

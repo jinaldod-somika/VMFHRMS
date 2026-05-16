@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Exit Interview Wizard -->
+    <record id="view_vmf_exit_interview_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.exit.interview.wizard.form</field>
+        <field name="model">vmf.exit.interview.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Exit Interview">
+                <sheet>
+                    <group>
+                        <field name="exit_id"/>
+                        <field name="interview_date"/>
+                        <field name="interviewer_id"/>
+                    </group>
+                    <group>
+                        <field name="exit_reason_category"/>
+                        <field name="detailed_reason"/>
+                    </group>
+                    <group>
+                        <field name="would_rejoin"/>
+                        <field name="recommend_company"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_interview" string="Complete Interview" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_exit_interview_wizard" model="ir.actions.act_window">
+        <field name="name">Exit Interview</field>
+        <field name="res_model">vmf.exit.interview.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_exit_id': active_id}</field>
+    </record>
+
+    <!-- Course Feedback Wizard -->
+    <record id="view_vmf_course_feedback_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.course.feedback.wizard.form</field>
+        <field name="model">vmf.course.feedback.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Training Feedback">
+                <sheet>
+                    <group>
+                        <field name="assignment_id"/>
+                        <field name="rating" widget="priority"/>
+                        <field name="relevant_to_job"/>
+                        <field name="feedback_text"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_submit_feedback" string="Submit Feedback" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_course_feedback_wizard" model="ir.actions.act_window">
+        <field name="name">Training Feedback</field>
+        <field name="res_model">vmf.course.feedback.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_assignment_id': active_id}</field>
+    </record>
+</odoo>

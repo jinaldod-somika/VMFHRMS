@@ -10,7 +10,7 @@
               groups="vmf_hrms.group_vmf_hr_manager"/>
 
     <!-- Recruitment -->
-    <menuitem id="menu_vmf_recruitment" name="Recruitment" parent="menu_vmf_root" sequence="10"/>
+    <menuitem id="menu_vmf_recruitment" name="Recruitment" parent="menu_vmf_root" sequence="10" />
 
     <menuitem id="menu_vmf_mrf" name="Manpower Requisitions" parent="menu_vmf_recruitment"
               action="action_vmf_mrf" sequence="1"/>
@@ -24,7 +24,7 @@
               action="hr.open_view_employee_list_my" sequence="1"/>
 
     <!-- Payroll -->
-    <menuitem id="menu_vmf_payroll" name="Payroll" parent="menu_vmf_root" sequence="30"
+    <!-- <menuitem id="menu_vmf_payroll" name="Payroll" parent="menu_vmf_root" sequence="30"
               groups="vmf_hrms.group_vmf_payroll"/>
 
     <menuitem id="menu_vmf_payroll_run" name="Payroll Runs" parent="menu_vmf_payroll"
@@ -34,10 +34,8 @@
     <menuitem id="menu_vmf_salary_structure" name="Salary Structures" parent="menu_vmf_payroll"
               action="action_vmf_salary_structure" sequence="10"/>
     <menuitem id="menu_vmf_employee_contract" name="Contracts" parent="menu_vmf_payroll"
-              action="action_vmf_employee_contract" sequence="11"/>
-    <menuitem id="menu_vmf_ff_settlement" name="F&amp;F Settlements" parent="menu_vmf_payroll"
-              action="action_vmf_ff_settlement" sequence="12"/>
-
+              action="action_vmf_employee_contract" sequence="11"/> -->
+   
     <!-- Travel -->
     <menuitem id="menu_vmf_travel" name="Travel" parent="menu_vmf_root" sequence="40"/>
 
@@ -95,6 +93,8 @@
 
     <menuitem id="menu_vmf_exit_request" name="Exit Requests" parent="menu_vmf_separation"
               action="action_vmf_exit_request" sequence="1"/>
+    <menuitem id="menu_vmf_ff_settlement" name="F&amp;F Settlements" parent="menu_vmf_separation"
+              action="action_vmf_ff_settlement" sequence="2"/>
 
     <!-- Employee Experience -->
     <menuitem id="menu_vmf_experience" name="Employee Experience" parent="menu_vmf_root" sequence="70"

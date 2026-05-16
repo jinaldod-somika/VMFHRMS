@@ -48,20 +48,20 @@
         <field name="arch" type="xml">
             <form string="Performance Review">
                 <header>
-                    <button name="action_start_self_appraisal" string="Start Self Appraisal" type="object"
+                    <button name="action_acknowledge" string="Acknowledge Goals" type="object"
                             invisible="state != 'draft'" class="btn-primary"/>
-                    <button name="action_submit_self" string="Submit Self Appraisal" type="object"
+                    <button name="action_start_self_appraisal" string="Start Self Appraisal" type="object"
+                            invisible="state != 'acknowledged'" class="btn-primary"/>
+                    <button name="%(action_vmf_self_appraisal_wizard)d" string="Submit Self Appraisal" type="action"
                             invisible="state != 'self_appraisal'" class="btn-primary"/>
                     <button name="action_submit_manager" string="Submit Manager Review" type="object"
                             invisible="state != 'manager_review'"
-                            groups="vmf_hrms.group_vmf_manager"/>
+                            groups="vmf_hrms.group_vmf_manager" class="btn-success"/>
                     <button name="action_release_rating" string="Release Rating" type="object"
-                            invisible="state not in ['manager_review','calibration']"
-                            groups="vmf_hrms.group_vmf_hr_manager" class="btn-success"/>
-                    <button name="action_acknowledge" string="Acknowledge" type="object"
-                            invisible="state != 'rating_released'"/>
+                            invisible="state != 'calibration'"
+                            groups="vmf_hrms.group_vmf_hr_manager" class="btn-warning"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="draft,self_appraisal,manager_review,calibration,rating_released,acknowledged"/>
+                           statusbar_visible="draft,acknowledged,self_appraisal,manager_review,calibration,released"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -152,7 +152,8 @@
                 <field name="final_rating"/>
                 <field name="rating_band"/>
                 <field name="state" widget="badge"
-                       decoration-success="state == 'acknowledged'"
+                       decoration-success="state == 'released'"
+                       decoration-info="state == 'acknowledged'"
                        decoration-warning="state in ['self_appraisal','manager_review']"/>
             </list>
         </field>

@@ -6,12 +6,13 @@ class VmfGrade(models.Model):
     _description = 'VMG Grade Master'
     _order = 'sequence, name'
 
-    name = fields.Char('Grade Code', required=True)
+    name = fields.Char('Grade Code', required=True, copy=False)
     description = fields.Char('Grade Description')
     grade_level = fields.Selection([
         ('workmen', 'Workmen (W1-W4)'),
         ('supervisory', 'Supervisory (S1-S5)'),
-        ('management', 'Management (M1-M12)'),
+        ('management', 'Management (M1-M8)'),
+        ('senior_management', 'Senior Management (M9-M12)'),
     ], string='Grade Level', required=True)
     sequence = fields.Integer('Sequence', default=10)
     min_salary_usd = fields.Float('Min Salary (USD)')
@@ -40,10 +41,27 @@ class VmfJobGrade(models.Model):
         ('manager', 'Manager'),
         ('senior_manager', 'Senior Manager'),
         ('director', 'Director'),
+        ('director_track', 'Director Track'),
         ('vp', 'VP / Head of Function'),
         ('c_level', 'C-Level'),
     ], string='Job Level')
     is_critical_role = fields.Boolean('Critical Role', default=False)
+    succession_plan_warning = fields.Char('Succession Plan Status', compute='_compute_succession_warning')
+
+    @api.depends('is_critical_role')
+    def _compute_succession_warning(self):
+        for rec in self:
+            if rec.is_critical_role:
+                plan = self.env['vmf.succession.plan'].search([
+                    ('critical_role_id', '=', rec.id),
+                    ('state', '=', 'active')
+                ], limit=1)
+                if not plan or plan.successor_count == 0:
+                    rec.succession_plan_warning = "⚠️ Critical Role requires an active Succession Plan with successors."
+                else:
+                    rec.succession_plan_warning = False
+            else:
+                rec.succession_plan_warning = False
     min_experience_years = fields.Integer('Min Experience (years)')
 
 
@@ -52,7 +70,7 @@ class VmfCostCenter(models.Model):
     _description = 'Cost Center'
     _order = 'code'
 
-    code = fields.Char('Cost Center Code', required=True)
+    code = fields.Char('Cost Center Code', required=True, copy=False)
     name = fields.Char('Cost Center Name', required=True)
     company_id = fields.Many2one('res.company', string='Company')
     active = fields.Boolean('Active', default=True)
@@ -68,7 +86,7 @@ class VmfBusinessUnit(models.Model):
     _order = 'name'
 
     name = fields.Char('Business Unit Name', required=True)
-    code = fields.Char('BU Code')
+    code = fields.Char('BU Code', copy=False)
     company_id = fields.Many2one('res.company', string='Company')
     active = fields.Boolean('Active', default=True)
 
@@ -79,5 +97,5 @@ class VmfRegion(models.Model):
     _order = 'name'
 
     name = fields.Char('Region Name', required=True)
-    code = fields.Char('Region Code')
+    code = fields.Char('Region Code', copy=False)
     active = fields.Boolean('Active', default=True)

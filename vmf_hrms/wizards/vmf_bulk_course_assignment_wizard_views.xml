@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_bulk_course_assignment_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.bulk.course.assignment.wizard.form</field>
+        <field name="model">vmf.bulk.course.assignment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bulk Assign Learning Path">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="learning_path_id" options="{'no_create': True}"/>
+                            <field name="target_completion_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Select Employees">
+                            <field name="employee_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="work_email"/>
+                                    <field name="department_id"/>
+                                    <field name="job_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_assign" string="Assign Now" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_bulk_course_assignment_wizard" model="ir.actions.act_window">
+        <field name="name">Bulk Assign Learning Path</field>
+        <field name="res_model">vmf.bulk.course.assignment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

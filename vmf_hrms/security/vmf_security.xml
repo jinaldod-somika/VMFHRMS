@@ -39,14 +39,14 @@
     <record id="group_vmf_hr_manager" model="res.groups">
         <field name="name">Business HR Manager</field>
         <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
-        <field name="implied_ids" eval="[(4, ref('group_vmf_recruiter'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_recruiter')), (4, ref('group_vmf_travel_desk')), (4, ref('hr.group_hr_user'))]"/>
         <field name="sequence">40</field>
     </record>
 
     <record id="group_vmf_payroll" model="res.groups">
         <field name="name">Payroll Officer</field>
         <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
-        <field name="implied_ids" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_travel_desk'))]"/>
         <field name="sequence">50</field>
     </record>
 
@@ -65,26 +65,26 @@
     </record>
 
     <!-- Record Rules (noupdate) -->
-    <data noupdate="1">
+    <data noupdate="0">
         <record id="rule_mrf_company" model="ir.rule">
             <field name="name">MRF: Company-based access</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_mrf"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_auditor'))]"/>
         </record>
 
         <record id="rule_candidate_company" model="ir.rule">
             <field name="name">Candidate: Company-based access</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_candidate"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_recruiter'))]"/>
+            <field name="groups" eval="[(4, ref('group_vmf_recruiter')), (4, ref('group_vmf_auditor'))]"/>
         </record>
 
         <record id="rule_payslip_payroll_only" model="ir.rule">
             <field name="name">Payslip: Payroll group company access</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_payslip"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_payroll'))]"/>
+            <field name="groups" eval="[(4, ref('group_vmf_payroll')), (4, ref('group_vmf_auditor'))]"/>
         </record>
 
         <record id="rule_payslip_own_employee" model="ir.rule">
@@ -98,7 +98,7 @@
             <field name="name">Travel: Company-based access</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_travel_request"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_travel_desk')), (4, ref('group_vmf_auditor'))]"/>
         </record>
 
         <record id="rule_travel_own_employee" model="ir.rule">
@@ -119,7 +119,7 @@
             <field name="name">Grievance: Company-based for HR</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_grievance"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_auditor'))]"/>
         </record>
     </data>
 </odoo>

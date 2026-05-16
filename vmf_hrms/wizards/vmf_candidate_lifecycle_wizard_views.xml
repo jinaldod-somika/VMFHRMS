@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Hold Wizard -->
+    <record id="view_vmf_candidate_hold_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.hold.wizard.form</field>
+        <field name="model">vmf.candidate.hold.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Put Candidate On Hold">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="hold_reason"/>
+                        <field name="expected_resume_date"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_hold" string="Confirm Hold" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_hold_wizard" model="ir.actions.act_window">
+        <field name="name">Put Candidate On Hold</field>
+        <field name="res_model" >vmf.candidate.hold.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+
+    <!-- Drop Wizard -->
+    <record id="view_vmf_candidate_drop_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.drop.wizard.form</field>
+        <field name="model">vmf.candidate.drop.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Candidate Offer Drop">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="drop_stage"/>
+                        <field name="drop_reason"/>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_drop" string="Confirm Drop" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_drop_wizard" model="ir.actions.act_window">
+        <field name="name">Candidate Offer Drop</field>
+        <field name="res_model">vmf.candidate.drop.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+
+    <!-- Medical Wizard -->
+    <record id="view_vmf_candidate_medical_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.medical.wizard.form</field>
+        <field name="model">vmf.candidate.medical.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Medical Clearance">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="medical_status"/>
+                        <field name="medical_clearance_date"/>
+                        <field name="medical_remarks"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_medical" string="Save" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_medical_wizard" model="ir.actions.act_window">
+        <field name="name">Medical Clearance</field>
+        <field name="res_model">vmf.candidate.medical.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+
+    <!-- BGV Wizard -->
+    <record id="view_vmf_candidate_bgv_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.bgv.wizard.form</field>
+        <field name="model">vmf.candidate.bgv.wizard</field>
+        <field name="arch" type="xml">
+            <form string="BGV Update">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="bgv_status"/>
+                        <field name="bgv_date"/>
+                        <field name="bgv_remarks"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_bgv" string="Save" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_bgv_wizard" model="ir.actions.act_window">
+        <field name="name">BGV Update</field>
+        <field name="res_model">vmf.candidate.bgv.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+
+    <!-- Visa Wizard -->
+    <record id="view_vmf_candidate_visa_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.visa.wizard.form</field>
+        <field name="model">vmf.candidate.visa.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Visa / PEC Processing">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="visa_type"/>
+                        <field name="action_type"/>
+                        <field name="action_date"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_visa" string="Save" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_visa_wizard" model="ir.actions.act_window">
+        <field name="name">Visa / PEC Processing</field>
+        <field name="res_model">vmf.candidate.visa.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+
+    <!-- Reopen Wizard -->
+    <record id="view_vmf_candidate_reopen_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.reopen.wizard.form</field>
+        <field name="model">vmf.candidate.reopen.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reopen Candidate">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="reopen_notes"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_reopen" string="Confirm Reopen" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_reopen_wizard" model="ir.actions.act_window">
+        <field name="name">Reopen Candidate</field>
+        <field name="res_model">vmf.candidate.reopen.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+</odoo>

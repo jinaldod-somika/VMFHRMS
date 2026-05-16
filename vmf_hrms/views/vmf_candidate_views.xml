@@ -23,14 +23,29 @@
                             invisible="state != 'offer_prepared'"/>
                     <button name="action_accept_offer" string="Offer Accepted" type="object"
                             invisible="state != 'offer_released'"/>
-                    <button name="action_bgv" string="Initiate BGV" type="object"
+                    
+                    <!-- Wizards -->
+                    <button name="%(action_vmf_candidate_bgv_wizard)d" string="Update BGV" type="action"
                             invisible="state != 'offer_accepted'"/>
-                    <button name="action_confirm_joining" string="Confirm Joining" type="object"
+                    <button name="%(action_vmf_candidate_medical_wizard)d" string="Update Medical" type="action"
                             invisible="state != 'bgv'"/>
+                    <button name="%(action_vmf_candidate_visa_wizard)d" string="Update Visa / PEC" type="action"
+                            invisible="state not in ['bgv', 'medical']"/>
+                    
+                    <button name="action_confirm_joining" string="Confirm Joining" type="object"
+                            invisible="state not in ['bgv', 'medical', 'visa']"/>
                     <button name="action_mark_joined" string="Mark Joined" type="object"
                             invisible="state != 'joining_confirmed'" class="btn-success"/>
                     <button name="action_reject" string="Reject" type="object"
                             invisible="state in ['joined','offer_dropped','rejected']"/>
+                    
+                    <button name="%(action_vmf_candidate_hold_wizard)d" string="Put On Hold" type="action" 
+                            invisible="state in ['joined','rejected','offer_dropped','on_hold']" class="btn-warning"/>
+                    <button name="%(action_vmf_candidate_reopen_wizard)d" string="Reopen / Resume" type="action" 
+                            invisible="state != 'on_hold'" class="btn-info"/>
+                    <button name="%(action_vmf_candidate_drop_wizard)d" string="Cancel / Drop" type="action" 
+                            invisible="state in ['joined','rejected','offer_dropped']" class="btn-danger"/>
+                    
                     <button name="action_create_employee" string="Create Employee" type="object"
                             invisible="state != 'joined'" class="btn-primary"
                             groups="vmf_hrms.group_vmf_hr_manager"/>
@@ -66,11 +81,16 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="Documents" name="documents">
+                            <group>
+                                <field name="candidate_document_ids" widget="many2many_binary" nolabel="1" colspan="2"/>
+                            </group>
+                        </page>
                         <page string="Interview Rounds">
                             <group string="Round 1">
                                 <group>
                                     <field name="interview1_date"/>
-                                    <field name="interview1_interviewer_id"/>
+                                    <field name="interview1_interviewer_ids" widget="many2many_tags"/>
                                 </group>
                                 <group>
                                     <field name="interview1_result"/>
@@ -80,7 +100,7 @@
                             <group string="Round 2">
                                 <group>
                                     <field name="interview2_date"/>
-                                    <field name="interview2_interviewer_id"/>
+                                    <field name="interview2_interviewer_ids" widget="many2many_tags"/>
                                 </group>
                                 <group>
                                     <field name="interview2_result"/>
@@ -90,7 +110,7 @@
                             <group string="Round 3">
                                 <group>
                                     <field name="interview3_date"/>
-                                    <field name="interview3_interviewer_id"/>
+                                    <field name="interview3_interviewer_ids" widget="many2many_tags"/>
                                 </group>
                                 <group>
                                     <field name="interview3_result"/>
@@ -118,6 +138,7 @@
                                 </group>
                                 <group>
                                     <field name="offer_currency_id"/>
+                                    <field name="current_ctc"/>
                                     <field name="offered_ctc"/>
                                 </group>
                             </group>
@@ -159,6 +180,7 @@
                                 <list editable="bottom">
                                     <field name="drop_date"/>
                                     <field name="drop_stage"/>
+                                    <field name="previous_state"/>
                                     <field name="drop_reason"/>
                                     <field name="days_lost"/>
                                     <field name="reinstated"/>
@@ -169,7 +191,9 @@
                                 <list editable="bottom">
                                     <field name="hold_start"/>
                                     <field name="hold_end"/>
+                                    <field name="previous_state"/>
                                     <field name="hold_reason"/>
+                                    <field name="reopen_reason"/>
                                     <field name="hold_days"/>
                                 </list>
                             </field>
@@ -199,6 +223,9 @@
                 <field name="grade_id"/>
                 <field name="sourcing_channel"/>
                 <field name="resume_received_date"/>
+                <field name="previous_state" decoration-info="True"/>
+                <field name="hold_reason"/>
+                <field name="drop_reason"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'joined'"
                        decoration-warning="state in ['offer_released','offer_accepted','bgv','visa']"

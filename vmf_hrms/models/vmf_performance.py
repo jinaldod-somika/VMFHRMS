@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.tools.translate import _
+from odoo.exceptions import UserError
 from datetime import date
 
 
@@ -88,11 +89,11 @@ class VmfPerformanceReview(models.Model):
 
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('self_appraisal', 'Self Appraisal'),
-        ('manager_review', 'Manager Review'),
-        ('calibration', 'Calibration'),
-        ('rating_released', 'Rating Released'),
         ('acknowledged', 'Acknowledged'),
+        ('self_appraisal', 'Self Appraisal'),
+        ('manager_review', 'Manager Reviewed'),
+        ('calibration', 'HR Calibration'),
+        ('released', 'Rating Released'),
         ('cancelled', 'Cancelled'),
     ], string='Status', default='draft', tracking=True)
 
@@ -149,6 +150,14 @@ class VmfPerformanceReview(models.Model):
             else:
                 rec.rating_band = 'does_not_meet'
 
+    def action_acknowledge(self):
+        for rec in self:
+            total_weight = sum(rec.goal_line_ids.mapped('weight'))
+            if total_weight != 100.0:
+                raise UserError(_("The total weight of KPIs must be exactly 100%."))
+            rec.write({'state': 'acknowledged'})
+            rec.message_post(body=_("Goals acknowledged by employee."))
+
     def action_start_self_appraisal(self):
         self.write({'state': 'self_appraisal'})
 
@@ -159,11 +168,21 @@ class VmfPerformanceReview(models.Model):
         self.write({'state': 'calibration'})
 
     def action_release_rating(self):
-        self.write({'state': 'rating_released'})
-        self.message_post(body=_('Rating released. Employee notified.'))
-
-    def action_acknowledge(self):
-        self.write({'state': 'acknowledged'})
+        for rec in self:
+            rec.state = 'released'
+            final_score = rec.final_rating or rec.manager_rating or 0.0
+            if final_score < 2.5:
+                # Auto-initiate PIP
+                pip = self.env['vmf.pip'].create({
+                    'employee_id': rec.employee_id.id,
+                    'improvement_areas': 'Rating below 2.5 in recent appraisal.',
+                    'expected_outcomes': 'Improve performance to minimum 3.0 level.',
+                })
+                rec.pip_id = pip.id
+                rec.pip_initiated = True
+                rec.message_post(body=_("Rating released. Score < 2.5. PIP automatically initiated: %s") % pip.name)
+            else:
+                rec.message_post(body=_("Rating released. Increment/Promotion letters can now be generated."))
 
 
 class VmfReviewGoalLine(models.Model):

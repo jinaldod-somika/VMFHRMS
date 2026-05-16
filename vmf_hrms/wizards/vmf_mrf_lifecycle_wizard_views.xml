@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ===================== HOLD WIZARD ===================== -->
+    <record id="view_vmf_mrf_hold_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.mrf.hold.wizard.form</field>
+        <field name="model">vmf.mrf.hold.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Put MRF On Hold">
+                <sheet>
+                    <div class="o_form_title">
+                        <h2>
+                            <i class="fa fa-pause-circle text-warning me-2" title="Hold Icon"/>
+                            Place Requisition On Hold
+                        </h2>
+                    </div>
+                    <group>
+                        <field name="mrf_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="hold_reason" placeholder="Describe the reason for placing this position on hold..." nolabel="0" widget="text"/>
+                        <field name="expected_resume_date" help="Leave empty if unknown"/>
+                        <field name="notify_hiring_manager"/>
+                    </group>
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fa fa-exclamation-triangle me-1" title="Warning"/> Placing an MRF on hold pauses the recruitment timeline and logs the hold period.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_hold" string="Confirm Hold" type="object" class="btn-warning"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_mrf_hold_wizard" model="ir.actions.act_window">
+        <field name="name">Put On Hold</field>
+        <field name="res_model">vmf.mrf.hold.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_mrf_id': active_id}</field>
+    </record>
+
+    <!-- ===================== DROP/CANCEL WIZARD ===================== -->
+    <record id="view_vmf_mrf_drop_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.mrf.drop.wizard.form</field>
+        <field name="model">vmf.mrf.drop.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cancel / Drop MRF">
+                <sheet>
+                    <div class="o_form_title">
+                        <h2>
+                            <i class="fa fa-times-circle text-danger me-2" title="Drop Icon"/>
+                            Cancel / Drop Requisition
+                        </h2>
+                    </div>
+                    <group>
+                        <field name="mrf_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="drop_reason"/>
+                        <field name="drop_notes" placeholder="Optional: provide additional context..." widget="text"/>
+                        <field name="notify_hiring_manager"/>
+                    </group>
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fa fa-exclamation-circle me-1" title="Warning Icon"/> <b>Warning:</b> Cancelling an MRF is irreversible. All linked candidates will retain their records but the position will be closed.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_drop" string="Confirm Cancel" type="object" class="btn-danger"/>
+                    <button string="Go Back" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_mrf_drop_wizard" model="ir.actions.act_window">
+        <field name="name">Cancel MRF</field>
+        <field name="res_model">vmf.mrf.drop.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_mrf_id': active_id}</field>
+    </record>
+
+    <!-- ===================== REOPEN WIZARD ===================== -->
+    <record id="view_vmf_mrf_reopen_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.mrf.reopen.wizard.form</field>
+        <field name="model">vmf.mrf.reopen.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reopen MRF">
+                <sheet>
+                    <div class="o_form_title">
+                        <h2>
+                            <i class="fa fa-play-circle text-success me-2" title="Reopen Icon"/>
+                            Resume Requisition
+                        </h2>
+                    </div>
+                    <group>
+                        <field name="mrf_id" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="reopen_notes" placeholder="Describe the reason for resuming recruitment..." widget="text"/>
+                    </group>
+                    <div class="alert alert-success" role="alert">
+                        <i class="fa fa-info-circle me-1" title="Info Icon"/> Reopening the MRF will close the active hold log entry and restore the status to <b>Budget Approved / Open</b>.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_reopen" string="Reopen Position" type="object" class="btn-success"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_mrf_reopen_wizard" model="ir.actions.act_window">
+        <field name="name">Reopen MRF</field>
+        <field name="res_model">vmf.mrf.reopen.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_mrf_id': active_id}</field>
+    </record>
+
+</odoo>

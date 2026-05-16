@@ -12,3 +12,6 @@ from . import vmf_grievance
 from . import vmf_headcount
 from . import vmf_learning
 from . import vmf_talent
+from . import res_partner_bank_ext
+# from . import hr_contract_ext
+

@@ -43,6 +43,8 @@ Covers:
         'mail',
         'base_setup',
         'base',
+        'om_hr_payroll',
+        'hr_homeworking',
     ],
     'data': [
         # Security
@@ -56,6 +58,11 @@ Covers:
         # Wizards (must be before menu)
         'wizards/vmf_payroll_run_wizard_views.xml',
         'wizards/vmf_headcount_report_wizard_views.xml',
+        'wizards/vmf_mrf_lifecycle_wizard_views.xml',
+        'wizards/vmf_candidate_lifecycle_wizard_views.xml',
+        'wizards/vmf_exit_learning_wizard_views.xml',
+        'wizards/vmf_performance_ess_wizard_views.xml',
+        'wizards/vmf_bulk_course_assignment_wizard_views.xml',
         # Master data view extensions
         'views/res_company_ext_views.xml',
         'views/hr_work_location_ext_views.xml',
@@ -66,6 +73,7 @@ Covers:
         'views/vmf_mrf_views.xml',
         'views/vmf_candidate_views.xml',
         'views/hr_employee_ext_views.xml',
+        'views/res_partner_bank_ext_views.xml',
         'views/vmf_payroll_views.xml',
         'views/vmf_travel_views.xml',
         'views/vmf_exit_views.xml',

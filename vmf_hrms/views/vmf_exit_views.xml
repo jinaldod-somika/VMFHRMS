@@ -23,6 +23,9 @@
                     <button name="action_complete" string="Complete Exit" type="object"
                             invisible="state != 'ff_approved'" class="btn-danger"
                             groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="%(action_vmf_exit_interview_wizard)d" string="Exit Interview" type="action"
+                            invisible="state not in ['manager_approved', 'hr_processing'] or exit_interview_done == True"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,submitted,manager_approved,hr_processing,ff_computed,ff_approved,completed"/>
                 </header>
@@ -52,7 +55,7 @@
                                 <list editable="bottom">
                                     <field name="department_name"/>
                                     <field name="responsible_id"/>
-                                    <field name="status" widget="badge"
+                                    <field name="status"
                                            decoration-success="status == 'cleared'"
                                            decoration-warning="status == 'in_review'"
                                            decoration-danger="status == 'hold'"/>
