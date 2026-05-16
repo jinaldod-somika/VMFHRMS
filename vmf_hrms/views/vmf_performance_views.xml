@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Goal Plan -->
+    <record id="view_vmf_goal_plan_form" model="ir.ui.view">
+        <field name="name">vmf.goal.plan.form</field>
+        <field name="model">vmf.goal.plan</field>
+        <field name="arch" type="xml">
+            <form string="Goal Plan">
+                <header>
+                    <button name="action_publish" string="Publish" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published,closed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="year"/>
+                        <field name="company_id"/>
+                        <field name="description"/>
+                    </group>
+                    <field name="goal_ids">
+                        <list editable="bottom">
+                            <field name="sequence"/>
+                            <field name="name"/>
+                            <field name="category"/>
+                            <field name="weight"/>
+                            <field name="target_value"/>
+                            <field name="target_unit"/>
+                            <field name="applicable_to"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_goal_plan" model="ir.actions.act_window">
+        <field name="name">Goal Plans</field>
+        <field name="res_model">vmf.goal.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Performance Review -->
+    <record id="view_vmf_performance_review_form" model="ir.ui.view">
+        <field name="name">vmf.performance.review.form</field>
+        <field name="model">vmf.performance.review</field>
+        <field name="arch" type="xml">
+            <form string="Performance Review">
+                <header>
+                    <button name="action_start_self_appraisal" string="Start Self Appraisal" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_submit_self" string="Submit Self Appraisal" type="object"
+                            invisible="state != 'self_appraisal'" class="btn-primary"/>
+                    <button name="action_submit_manager" string="Submit Manager Review" type="object"
+                            invisible="state != 'manager_review'"
+                            groups="vmf_hrms.group_vmf_manager"/>
+                    <button name="action_release_rating" string="Release Rating" type="object"
+                            invisible="state not in ['manager_review','calibration']"
+                            groups="vmf_hrms.group_vmf_hr_manager" class="btn-success"/>
+                    <button name="action_acknowledge" string="Acknowledge" type="object"
+                            invisible="state != 'rating_released'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,self_appraisal,manager_review,calibration,rating_released,acknowledged"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="manager_id" readonly="1"/>
+                            <field name="company_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="grade_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="review_type"/>
+                            <field name="review_period_year"/>
+                            <field name="review_period_quarter"/>
+                            <field name="date_review"/>
+                            <field name="date_due"/>
+                        </group>
+                    </group>
+                    <group string="Overall Ratings">
+                        <group>
+                            <field name="self_rating"/>
+                            <field name="manager_rating"/>
+                            <field name="final_rating"/>
+                        </group>
+                        <group>
+                            <field name="rating_band" readonly="1"/>
+                            <field name="increment_recommended"/>
+                            <field name="promotion_recommended"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="KPI Ratings">
+                            <field name="goal_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence"/>
+                                    <field name="name"/>
+                                    <field name="weight"/>
+                                    <field name="target"/>
+                                    <field name="unit"/>
+                                    <field name="actual_achievement"/>
+                                    <field name="self_rating"/>
+                                    <field name="manager_rating"/>
+                                    <field name="final_rating"/>
+                                    <field name="weighted_score" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Comments">
+                            <group>
+                                <field name="self_appraisal_comments"/>
+                                <field name="manager_comments"/>
+                                <field name="calibration_comments"/>
+                            </group>
+                        </page>
+                        <page string="Development">
+                            <group>
+                                <field name="strengths"/>
+                                <field name="areas_for_improvement"/>
+                                <field name="development_actions"/>
+                            </group>
+                            <group>
+                                <field name="pip_initiated"/>
+                                <field name="pip_id" invisible="pip_initiated == False"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_performance_review_list" model="ir.ui.view">
+        <field name="name">vmf.performance.review.list</field>
+        <field name="model">vmf.performance.review</field>
+        <field name="arch" type="xml">
+            <list string="Performance Reviews">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="company_id"/>
+                <field name="department_id"/>
+                <field name="review_type"/>
+                <field name="review_period_year"/>
+                <field name="date_review"/>
+                <field name="final_rating"/>
+                <field name="rating_band"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'acknowledged'"
+                       decoration-warning="state in ['self_appraisal','manager_review']"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_performance_review" model="ir.actions.act_window">
+        <field name="name">Performance Reviews</field>
+        <field name="res_model">vmf.performance.review</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- PIP -->
+    <record id="view_vmf_pip_form" model="ir.ui.view">
+        <field name="name">vmf.pip.form</field>
+        <field name="model">vmf.pip</field>
+        <field name="arch" type="xml">
+            <form string="PIP">
+                <header>
+                    <button name="action_close_improved" string="Close — Improved" type="object"
+                            invisible="state != 'active'" class="btn-success"/>
+                    <button name="action_close_exited" string="Close — Exit Process" type="object"
+                            invisible="state != 'active'" class="btn-danger"/>
+                    <field name="state" widget="statusbar" statusbar_visible="active,extended,closed_improved,closed_exited"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="manager_id" readonly="1"/>
+                            <field name="date_initiated"/>
+                            <field name="date_end"/>
+                            <field name="duration_weeks"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="improvement_areas"/>
+                        <field name="expected_outcomes"/>
+                        <field name="support_provided"/>
+                        <field name="closure_reason"/>
+                    </group>
+                    <field name="review_checkpoint_ids">
+                        <list editable="bottom">
+                            <field name="checkpoint_date"/>
+                            <field name="reviewer_id"/>
+                            <field name="rating"/>
+                            <field name="progress_notes"/>
+                            <field name="outcome"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_pip" model="ir.actions.act_window">
+        <field name="name">Performance Improvement Plans</field>
+        <field name="res_model">vmf.pip</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

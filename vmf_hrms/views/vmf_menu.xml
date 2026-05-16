@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main VMG HRMS Menu -->
+    <menuitem id="menu_vmf_root" name="VMG HRMS" sequence="10"
+              web_icon="vmf_hrms,static/description/icon.png"/>
+
+    <!-- Dashboard -->
+    <menuitem id="menu_vmf_dashboard" name="Dashboard" parent="menu_vmf_root"
+              action="action_vmf_group_hr_dashboard" sequence="1"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <!-- Recruitment -->
+    <menuitem id="menu_vmf_recruitment" name="Recruitment" parent="menu_vmf_root" sequence="10"/>
+
+    <menuitem id="menu_vmf_mrf" name="Manpower Requisitions" parent="menu_vmf_recruitment"
+              action="action_vmf_mrf" sequence="1"/>
+    <menuitem id="menu_vmf_candidate" name="Candidates" parent="menu_vmf_recruitment"
+              action="action_vmf_candidate" sequence="2"/>
+
+    <!-- Employee -->
+    <menuitem id="menu_vmf_employee" name="Employees" parent="menu_vmf_root" sequence="20"/>
+
+    <menuitem id="menu_vmf_employee_list" name="All Employees" parent="menu_vmf_employee"
+              action="hr.open_view_employee_list_my" sequence="1"/>
+
+    <!-- Payroll -->
+    <menuitem id="menu_vmf_payroll" name="Payroll" parent="menu_vmf_root" sequence="30"
+              groups="vmf_hrms.group_vmf_payroll"/>
+
+    <menuitem id="menu_vmf_payroll_run" name="Payroll Runs" parent="menu_vmf_payroll"
+              action="action_vmf_payroll_run" sequence="1"/>
+    <menuitem id="menu_vmf_payslip" name="Payslips" parent="menu_vmf_payroll"
+              action="action_vmf_payslip" sequence="2"/>
+    <menuitem id="menu_vmf_salary_structure" name="Salary Structures" parent="menu_vmf_payroll"
+              action="action_vmf_salary_structure" sequence="10"/>
+    <menuitem id="menu_vmf_employee_contract" name="Contracts" parent="menu_vmf_payroll"
+              action="action_vmf_employee_contract" sequence="11"/>
+    <menuitem id="menu_vmf_ff_settlement" name="F&amp;F Settlements" parent="menu_vmf_payroll"
+              action="action_vmf_ff_settlement" sequence="12"/>
+
+    <!-- Travel -->
+    <menuitem id="menu_vmf_travel" name="Travel" parent="menu_vmf_root" sequence="40"/>
+
+    <menuitem id="menu_vmf_travel_request" name="Travel Requests" parent="menu_vmf_travel"
+              action="action_vmf_travel_request" sequence="1"/>
+    <menuitem id="menu_vmf_travel_desk" name="Travel Desk Queue" parent="menu_vmf_travel"
+              action="action_vmf_travel_desk_queue" sequence="2"
+              groups="vmf_hrms.group_vmf_travel_desk"/>
+
+    <!-- Performance -->
+    <menuitem id="menu_vmf_performance" name="Performance" parent="menu_vmf_root" sequence="50"/>
+
+    <menuitem id="menu_vmf_goal_plan" name="Goal Plans" parent="menu_vmf_performance"
+              action="action_vmf_goal_plan" sequence="1"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+    <menuitem id="menu_vmf_performance_review" name="Performance Reviews" parent="menu_vmf_performance"
+              action="action_vmf_performance_review" sequence="2"/>
+    <menuitem id="menu_vmf_pip" name="PIPs" parent="menu_vmf_performance"
+              action="action_vmf_pip" sequence="3"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <!-- Talent &amp; Learning -->
+    <menuitem id="menu_vmf_talent_learning" name="Talent &amp; Learning" parent="menu_vmf_root" sequence="55"/>
+
+    <!-- Learning -->
+    <menuitem id="menu_vmf_learning" name="Learning" parent="menu_vmf_talent_learning" sequence="1"/>
+    <menuitem id="menu_vmf_my_courses" name="My Courses" parent="menu_vmf_learning"
+              action="action_vmf_my_courses" sequence="1"/>
+    <menuitem id="menu_vmf_course_catalog" name="Course Catalog" parent="menu_vmf_learning"
+              action="action_vmf_course" sequence="2"/>
+    <menuitem id="menu_vmf_course_assignments" name="Course Assignments" parent="menu_vmf_learning"
+              action="action_vmf_course_assignment" sequence="3"
+              groups="vmf_hrms.group_vmf_manager"/>
+    <menuitem id="menu_vmf_learning_paths" name="Learning Paths" parent="menu_vmf_learning"
+              action="action_vmf_learning_path" sequence="4"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <!-- Talent -->
+    <menuitem id="menu_vmf_talent" name="Talent" parent="menu_vmf_talent_learning" sequence="2"/>
+    <menuitem id="menu_vmf_idp" name="Development Plans (IDP)" parent="menu_vmf_talent"
+              action="action_vmf_idp" sequence="1"/>
+    <menuitem id="menu_vmf_talent_review" name="Talent Review (9-Box)" parent="menu_vmf_talent"
+              action="action_vmf_talent_review" sequence="2"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+    <menuitem id="menu_vmf_succession_plan" name="Succession Plans" parent="menu_vmf_talent"
+              action="action_vmf_succession_plan" sequence="3"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+    <menuitem id="menu_vmf_skill_gap" name="Skill Gap Analysis" parent="menu_vmf_talent"
+              action="action_vmf_skill_gap" sequence="4"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <!-- Separation -->
+    <menuitem id="menu_vmf_separation" name="Separation" parent="menu_vmf_root" sequence="60"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <menuitem id="menu_vmf_exit_request" name="Exit Requests" parent="menu_vmf_separation"
+              action="action_vmf_exit_request" sequence="1"/>
+
+    <!-- Employee Experience -->
+    <menuitem id="menu_vmf_experience" name="Employee Experience" parent="menu_vmf_root" sequence="70"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <menuitem id="menu_vmf_grievance" name="Grievances" parent="menu_vmf_experience"
+              action="action_vmf_grievance" sequence="1"/>
+
+    <!-- Reports -->
+    <menuitem id="menu_vmf_reports" name="Reports" parent="menu_vmf_root" sequence="80"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <menuitem id="menu_vmf_headcount" name="Headcount Snapshots" parent="menu_vmf_reports"
+              action="action_vmf_headcount_snapshot" sequence="1"/>
+    <menuitem id="menu_vmf_headcount_wizard" name="Generate Headcount Report" parent="menu_vmf_reports"
+              action="action_vmf_headcount_report_wizard" sequence="2"/>
+
+    <!-- Configuration (Master Data) -->
+    <menuitem id="menu_vmf_configuration" name="Configuration" parent="menu_vmf_root" sequence="90"
+              groups="vmf_hrms.group_vmf_hr_manager"/>
+
+    <!-- Organization Masters -->
+    <menuitem id="menu_vmf_config_org" name="Organization" parent="menu_vmf_configuration" sequence="1"/>
+    <menuitem id="menu_vmf_company" name="Companies" parent="menu_vmf_config_org"
+              action="action_vmf_company" sequence="1"/>
+    <menuitem id="menu_vmf_work_location" name="Work Locations" parent="menu_vmf_config_org"
+              action="hr.hr_work_location_action" sequence="2"/>
+    <menuitem id="menu_vmf_department" name="Departments" parent="menu_vmf_config_org"
+              action="hr.hr_department_tree_action" sequence="3"/>
+    <menuitem id="menu_vmf_hr_job" name="Job Positions" parent="menu_vmf_config_org"
+              action="action_vmf_hr_job" sequence="4"/>
+    <menuitem id="menu_vmf_grade" name="Grades" parent="menu_vmf_config_org"
+              action="action_vmf_grade" sequence="5"/>
+    <menuitem id="menu_vmf_business_unit" name="Business Units" parent="menu_vmf_config_org"
+              action="action_vmf_business_unit" sequence="6"/>
+    <menuitem id="menu_vmf_cost_center" name="Cost Centers" parent="menu_vmf_config_org"
+              action="action_vmf_cost_center" sequence="7"/>
+    <menuitem id="menu_vmf_region" name="Regions" parent="menu_vmf_config_org"
+              action="action_vmf_region" sequence="8"/>
+
+    <!-- Travel Masters -->
+    <menuitem id="menu_vmf_config_travel" name="Travel" parent="menu_vmf_configuration" sequence="2"/>
+    <menuitem id="menu_vmf_travel_agent" name="Travel Agents" parent="menu_vmf_config_travel"
+              action="action_vmf_travel_agent" sequence="1"/>
+    <menuitem id="menu_vmf_airport" name="Airport Master" parent="menu_vmf_config_travel"
+              action="action_vmf_airport" sequence="2"/>
+
+    <!-- Talent &amp; Learning Masters -->
+    <menuitem id="menu_vmf_config_talent" name="Talent &amp; Learning" parent="menu_vmf_configuration" sequence="3"/>
+    <menuitem id="menu_vmf_config_competency" name="Competencies" parent="menu_vmf_config_talent"
+              action="action_vmf_competency" sequence="1"/>
+    <menuitem id="menu_vmf_config_competency_matrix" name="Competency Matrix" parent="menu_vmf_config_talent"
+              action="action_vmf_competency_matrix" sequence="2"/>
+</odoo>

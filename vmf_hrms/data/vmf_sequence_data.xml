@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_vmf_mrf" model="ir.sequence">
+        <field name="name">Manpower Requisition Form</field>
+        <field name="code">vmf.mrf</field>
+        <field name="prefix">REQ-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_candidate" model="ir.sequence">
+        <field name="name">Candidate UID</field>
+        <field name="code">vmf.candidate</field>
+        <field name="prefix">CAND-</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_employee_expat" model="ir.sequence">
+        <field name="name">Employee Number — Expat</field>
+        <field name="code">vmf.employee.expat</field>
+        <field name="prefix">EXP-</field>
+        <field name="padding">6</field>
+        <field name="number_next">3000001</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_employee_national" model="ir.sequence">
+        <field name="name">Employee Number — National</field>
+        <field name="code">vmf.employee.national</field>
+        <field name="prefix">NAT-</field>
+        <field name="padding">6</field>
+        <field name="number_next">1000001</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_employee_subcontractor" model="ir.sequence">
+        <field name="name">Employee Number — Subcontractor</field>
+        <field name="code">vmf.employee.subcontractor</field>
+        <field name="prefix">SUB-</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_payroll_run" model="ir.sequence">
+        <field name="name">Payroll Run</field>
+        <field name="code">vmf.payroll.run</field>
+        <field name="prefix">PAY-%(year)s-%(month)s-</field>
+        <field name="padding">3</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_travel_request" model="ir.sequence">
+        <field name="name">Travel Request</field>
+        <field name="code">vmf.travel.request</field>
+        <field name="prefix">TRV-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_exit_request" model="ir.sequence">
+        <field name="name">Exit Request</field>
+        <field name="code">vmf.exit.request</field>
+        <field name="prefix">EXIT-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_ff_settlement" model="ir.sequence">
+        <field name="name">F&amp;F Settlement</field>
+        <field name="code">vmf.ff.settlement</field>
+        <field name="prefix">FF-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_grievance" model="ir.sequence">
+        <field name="name">Grievance Case</field>
+        <field name="code">vmf.grievance</field>
+        <field name="prefix">GRV-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_pip" model="ir.sequence">
+        <field name="name">Performance Improvement Plan</field>
+        <field name="code">vmf.pip</field>
+        <field name="prefix">PIP-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_course" model="ir.sequence">
+        <field name="name">Learning Course Code</field>
+        <field name="code">vmf.course</field>
+        <field name="prefix">CRS-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_learning_path" model="ir.sequence">
+        <field name="name">Learning Path Code</field>
+        <field name="code">vmf.learning.path</field>
+        <field name="prefix">LP-</field>
+        <field name="padding">3</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_course_assignment" model="ir.sequence">
+        <field name="name">Course Assignment Reference</field>
+        <field name="code">vmf.course.assignment</field>
+        <field name="prefix">CA-%(year)s-</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
+    <record id="seq_vmf_idp" model="ir.sequence">
+        <field name="name">Individual Development Plan</field>
+        <field name="code">vmf.idp</field>
+        <field name="prefix">IDP-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>

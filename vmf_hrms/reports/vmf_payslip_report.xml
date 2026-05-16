@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_payslip" model="ir.actions.report">
+        <field name="name">Payslip</field>
+        <field name="model">vmf.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vmf_hrms.report_payslip</field>
+        <field name="report_file">vmf_hrms.report_payslip</field>
+        <field name="binding_model_id" ref="model_vmf_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_payslip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="slip">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <h2>PAYSLIP</h2>
+                                <p>
+                                    <strong>Employee:</strong> <t t-esc="slip.employee_id.name"/><br/>
+                                    <strong>Employee No:</strong> <t t-esc="slip.employee_id.vmf_employee_number"/><br/>
+                                    <strong>Department:</strong> <t t-esc="slip.department_id.name"/><br/>
+                                    <strong>Grade:</strong> <t t-esc="slip.grade_id.name"/>
+                                </p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <p>
+                                    <strong>Reference:</strong> <t t-esc="slip.name"/><br/>
+                                    <strong>Period:</strong> <t t-esc="slip.date_start"/> to <t t-esc="slip.date_end"/><br/>
+                                    <strong>Status:</strong> <t t-esc="slip.state"/>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <strong>Working Days:</strong> <t t-esc="slip.working_days"/><br/>
+                                <strong>Paid Days:</strong> <t t-esc="slip.paid_days"/><br/>
+                                <strong>LOP Days:</strong> <t t-esc="slip.lop_days"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr class="bg-light">
+                                    <th>Earnings</th>
+                                    <th class="text-end">Amount</th>
+                                    <th>Deductions</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="earnings" t-value="slip.line_ids.filtered(lambda l: l.component_type == 'earning')"/>
+                                <t t-set="deductions" t-value="slip.line_ids.filtered(lambda l: l.component_type == 'deduction')"/>
+                                <t t-set="max_rows" t-value="max(len(earnings), len(deductions))"/>
+                                <t t-foreach="range(max_rows)" t-as="i">
+                                    <tr>
+                                        <td><t t-if="i &lt; len(earnings)"><t t-esc="earnings[i].name"/></t></td>
+                                        <td class="text-end">
+                                            <t t-if="i &lt; len(earnings)">
+                                                <t t-esc="'{:,.2f}'.format(earnings[i].amount)"/>
+                                            </t>
+                                        </td>
+                                        <td><t t-if="i &lt; len(deductions)"><t t-esc="deductions[i].name"/></t></td>
+                                        <td class="text-end">
+                                            <t t-if="i &lt; len(deductions)">
+                                                <t t-esc="'{:,.2f}'.format(deductions[i].amount)"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr class="fw-bold bg-light">
+                                    <td>Gross Pay</td>
+                                    <td class="text-end"><t t-esc="'{:,.2f}'.format(slip.gross_pay)"/> <t t-esc="slip.currency_id.symbol"/></td>
+                                    <td>Total Deductions</td>
+                                    <td class="text-end"><t t-esc="'{:,.2f}'.format(slip.total_deductions)"/> <t t-esc="slip.currency_id.symbol"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-success fw-bold">
+                                    <td colspan="3"><strong>NET PAY</strong></td>
+                                    <td class="text-end"><strong><t t-esc="'{:,.2f}'.format(slip.net_pay)"/> <t t-esc="slip.currency_id.symbol"/></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <p class="text-muted mt-4" style="font-size: 10px;">
+                            This is a computer-generated payslip and does not require a signature.
+                            Confidential — For the employee's use only.
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

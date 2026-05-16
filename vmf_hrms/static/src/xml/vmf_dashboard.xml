@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="vmf_hrms.Dashboard">
+        <div class="vmf_dashboard_container">
+            <div t-if="state.loading" class="vmf_loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+
+            <div t-else="">
+                <!-- KPI Row (6 items) -->
+                <div class="vmf_kpi_row">
+                    <!-- Headcount -->
+                    <div class="vmf_kpi_card headcount">
+                        <div class="vmf_kpi_label">Headcount</div>
+                        <div class="vmf_kpi_value"><t t-esc="state.totalEmployees"/></div>
+                        <div class="vmf_kpi_subtext up">+ 5 vs Mar</div>
+                    </div>
+                    <!-- Open MRFs -->
+                    <div class="vmf_kpi_card mrf" t-on-click="openMRF">
+                        <div class="vmf_kpi_label">Open MRFs</div>
+                        <div class="vmf_kpi_value"><t t-esc="state.openPositions"/></div>
+                        <div class="vmf_kpi_subtext down"><t t-esc="state.criticalPositions"/> critical</div>
+                    </div>
+                    <!-- Attrition -->
+                    <div class="vmf_kpi_card attrition">
+                        <div class="vmf_kpi_label">Attrition (YTD)</div>
+                        <div class="vmf_kpi_value"><t t-esc="state.attritionRate"/>%</div>
+                        <div class="vmf_kpi_subtext down">- 0.2 pp</div>
+                    </div>
+                    <!-- Payroll -->
+                    <div class="vmf_kpi_card payroll">
+                        <div class="vmf_kpi_label">Payroll Apr</div>
+                        <div class="vmf_kpi_value">$ <t t-esc="state.payrollTotal"/> M</div>
+                        <div class="vmf_kpi_subtext up">+ 1.6%</div>
+                    </div>
+                    <!-- Travel Spend -->
+                    <div class="vmf_kpi_card travel" t-on-click="openTravel">
+                        <div class="vmf_kpi_label">Travel Spend</div>
+                        <div class="vmf_kpi_value">$ <t t-esc="state.travelSpend"/> k</div>
+                        <div class="vmf_kpi_subtext up">+ 8% vs Mar</div>
+                    </div>
+                    <!-- HIPO Coverage -->
+                    <div class="vmf_kpi_card hipo">
+                        <div class="vmf_kpi_label">HIPO Coverage</div>
+                        <div class="vmf_kpi_value"><t t-esc="state.hipoCoverage"/>%</div>
+                        <div class="vmf_kpi_subtext neutral">Target 70%</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="row">
+                    <!-- Headcount by Sub-Category -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="vmf_chart_box">
+                            <h5>Headcount by Sub-Category</h5>
+                            <div t-foreach="state.headcountByCategory" t-as="cat" t-key="cat.label" class="vmf_bar_row">
+                                <div class="vmf_bar_label"><t t-esc="cat.label"/></div>
+                                <div class="vmf_bar_container">
+                                    <div t-attf-class="vmf_bar_fill cat#{cat_index}" t-attf-style="width: #{cat.percentage}%">
+                                        <t t-esc="cat.label"/> — <t t-esc="cat.count"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recruitment Funnel -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="vmf_chart_box">
+                            <h5>Recruitment Funnel — FYTD</h5>
+                            <div t-foreach="state.recruitmentFunnel" t-as="stage" t-key="stage.label" class="vmf_bar_row">
+                                <div class="vmf_bar_container" style="margin-left: 0;">
+                                    <div t-attf-class="vmf_bar_fill #{stage.label.toLowerCase()}" t-attf-style="width: #{stage.width}%">
+                                        <t t-esc="stage.label"/> — <t t-esc="stage.count"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Alert -->
+                <div class="vmf_footer_alert">
+                    <p>Drill-down enabled — click any KPI or bar to see the underlying list.</p>
+                    <div class="vmf_footer_subtext">Filters: company, region, employee category, period.</div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

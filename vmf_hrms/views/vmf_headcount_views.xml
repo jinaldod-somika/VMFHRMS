@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_headcount_snapshot_form" model="ir.ui.view">
+        <field name="name">vmf.headcount.snapshot.form</field>
+        <field name="model">vmf.headcount.snapshot</field>
+        <field name="arch" type="xml">
+            <form string="Headcount Snapshot">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="snapshot_date"/>
+                            <field name="snapshot_month" readonly="1"/>
+                            <field name="company_id"/>
+                            <field name="generated_by" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="prior_month_total"/>
+                            <field name="total_headcount" readonly="1"/>
+                            <field name="variance" readonly="1"/>
+                            <field name="variance_pct" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Headcount by Category">
+                        <group>
+                            <field name="expat_permanent"/>
+                            <field name="expat_contractual"/>
+                            <field name="expat_total" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="national_permanent"/>
+                            <field name="national_contractual"/>
+                            <field name="security_agency"/>
+                            <field name="national_total" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="expat_national_ratio" readonly="1"/>
+                    </group>
+                    <group string="Deviation Justification">
+                        <field name="deviation_justification"/>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_headcount_snapshot_list" model="ir.ui.view">
+        <field name="name">vmf.headcount.snapshot.list</field>
+        <field name="model">vmf.headcount.snapshot</field>
+        <field name="arch" type="xml">
+            <list string="Headcount Snapshots">
+                <field name="snapshot_month"/>
+                <field name="company_id"/>
+                <field name="expat_permanent"/>
+                <field name="expat_contractual"/>
+                <field name="national_permanent"/>
+                <field name="national_contractual"/>
+                <field name="security_agency"/>
+                <field name="expat_total"/>
+                <field name="national_total"/>
+                <field name="total_headcount"/>
+                <field name="prior_month_total"/>
+                <field name="variance" decoration-danger="variance &lt; 0" decoration-success="variance &gt; 0"/>
+                <field name="variance_pct"/>
+                <field name="expat_national_ratio"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_headcount_snapshot_search" model="ir.ui.view">
+        <field name="name">vmf.headcount.snapshot.search</field>
+        <field name="model">vmf.headcount.snapshot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="company_id"/>
+                <field name="snapshot_month"/>
+                <group>
+                    <filter string="Month" name="by_month" context="{'group_by': 'snapshot_month'}"/>
+                    <filter string="Company" name="by_company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_headcount_snapshot" model="ir.actions.act_window">
+        <field name="name">Headcount Snapshots</field>
+        <field name="res_model">vmf.headcount.snapshot</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

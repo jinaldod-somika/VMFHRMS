@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Competency -->
+    <record id="view_vmf_competency_list" model="ir.ui.view">
+        <field name="name">vmf.competency.list</field>
+        <field name="model">vmf.competency</field>
+        <field name="arch" type="xml">
+            <list string="Competencies" editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="skill_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_competency_form" model="ir.ui.view">
+        <field name="name">vmf.competency.form</field>
+        <field name="model">vmf.competency</field>
+        <field name="arch" type="xml">
+            <form string="Competency">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="category"/>
+                        </group>
+                        <group>
+                            <field name="skill_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="description"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_competency" model="ir.actions.act_window">
+        <field name="name">Competencies</field>
+        <field name="res_model">vmf.competency</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Competency Matrix -->
+    <record id="view_vmf_competency_matrix_list" model="ir.ui.view">
+        <field name="name">vmf.competency.matrix.list</field>
+        <field name="model">vmf.competency.matrix</field>
+        <field name="arch" type="xml">
+            <list string="Competency Matrix" editable="bottom">
+                <field name="grade_id"/>
+                <field name="job_id"/>
+                <field name="competency_id"/>
+                <field name="required_level"/>
+                <field name="is_critical"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_competency_matrix_form" model="ir.ui.view">
+        <field name="name">vmf.competency.matrix.form</field>
+        <field name="model">vmf.competency.matrix</field>
+        <field name="arch" type="xml">
+            <form string="Competency Requirement">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="grade_id"/>
+                            <field name="job_id"/>
+                            <field name="competency_id"/>
+                        </group>
+                        <group>
+                            <field name="required_level"/>
+                            <field name="is_critical"/>
+                        </group>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_competency_matrix_search" model="ir.ui.view">
+        <field name="name">vmf.competency.matrix.search</field>
+        <field name="model">vmf.competency.matrix</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="grade_id"/>
+                <field name="job_id"/>
+                <field name="competency_id"/>
+                <filter name="filter_critical" string="Critical Only" domain="[('is_critical','=',True)]"/>
+                <group>
+                    <filter name="group_grade" string="Grade" context="{'group_by': 'grade_id'}"/>
+                    <filter name="group_job" string="Job Position" context="{'group_by': 'job_id'}"/>
+                    <filter name="group_competency" string="Competency" context="{'group_by': 'competency_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_competency_matrix" model="ir.actions.act_window">
+        <field name="name">Competency Matrix</field>
+        <field name="res_model">vmf.competency.matrix</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_vmf_competency_matrix_search"/>
+    </record>
+
+    <!-- IDP -->
+    <record id="view_vmf_idp_list" model="ir.ui.view">
+        <field name="name">vmf.idp.list</field>
+        <field name="model">vmf.idp</field>
+        <field name="arch" type="xml">
+            <list string="IDPs"
+                  decoration-success="state == 'completed'"
+                  decoration-info="state == 'active'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="manager_id"/>
+                <field name="department_id"/>
+                <field name="period_start"/>
+                <field name="period_end"/>
+                <field name="overall_progress" widget="progressbar"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_idp_form" model="ir.ui.view">
+        <field name="name">vmf.idp.form</field>
+        <field name="model">vmf.idp</field>
+        <field name="arch" type="xml">
+            <form string="Individual Development Plan">
+                <header>
+                    <button name="action_agree" string="Agree with Employee" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_activate" string="Activate" type="object"
+                            invisible="state != 'agreed'" class="btn-primary"/>
+                    <button name="action_complete" string="Mark Completed" type="object"
+                            invisible="state != 'active'" class="btn-success"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['completed','cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,agreed,active,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="manager_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="grade_id" readonly="1"/>
+                            <field name="job_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="period_start"/>
+                            <field name="period_end"/>
+                            <field name="overall_progress" widget="progressbar"/>
+                            <field name="review_id"/>
+                            <field name="talent_review_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Aspiration &amp; Focus">
+                            <group>
+                                <field name="aspiration"/>
+                                <field name="strengths_summary"/>
+                                <field name="development_focus"/>
+                            </group>
+                        </page>
+                        <page string="Development Actions">
+                            <field name="action_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="competency_id"/>
+                                    <field name="current_level"/>
+                                    <field name="target_level"/>
+                                    <field name="action_type"/>
+                                    <field name="course_id"/>
+                                    <field name="target_date"/>
+                                    <field name="status"/>
+                                </list>
+                                <form string="Development Action">
+                                    <group>
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="competency_id"/>
+                                            <field name="current_level"/>
+                                            <field name="target_level"/>
+                                        </group>
+                                        <group>
+                                            <field name="action_type"/>
+                                            <field name="course_id"/>
+                                            <field name="target_date"/>
+                                            <field name="completion_date"/>
+                                            <field name="status"/>
+                                        </group>
+                                    </group>
+                                    <field name="notes"/>
+                                    <button name="action_create_course_assignment" string="Create Course Assignment"
+                                            type="object" class="btn-primary"
+                                            invisible="not course_id or status == 'completed'"/>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_idp_search" model="ir.ui.view">
+        <field name="name">vmf.idp.search</field>
+        <field name="model">vmf.idp</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <filter name="filter_my" string="My IDPs"
+                        domain="[('employee_id.user_id','=',uid)]"/>
+                <filter name="filter_team" string="My Team"
+                        domain="[('employee_id.parent_id.user_id','=',uid)]"/>
+                <separator/>
+                <filter name="filter_active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_idp" model="ir.actions.act_window">
+        <field name="name">Individual Development Plans</field>
+        <field name="res_model">vmf.idp</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_vmf_idp_search"/>
+    </record>
+
+    <!-- Talent Review (9-Box) -->
+    <record id="view_vmf_talent_review_list" model="ir.ui.view">
+        <field name="name">vmf.talent.review.list</field>
+        <field name="model">vmf.talent.review</field>
+        <field name="arch" type="xml">
+            <list string="Talent Reviews"
+                  decoration-success="is_hipo"
+                  decoration-warning="retention_risk == 'high'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="grade_id"/>
+                <field name="review_year"/>
+                <field name="performance_rating"/>
+                <field name="potential_rating"/>
+                <field name="nine_box_position"/>
+                <field name="is_hipo" widget="boolean_toggle"/>
+                <field name="retention_risk"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_talent_review_form" model="ir.ui.view">
+        <field name="name">vmf.talent.review.form</field>
+        <field name="model">vmf.talent.review</field>
+        <field name="arch" type="xml">
+            <form string="Talent Review">
+                <header>
+                    <button name="action_calibrate" string="Calibrate" type="object"
+                            invisible="state != 'draft'" class="btn-primary"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            invisible="state != 'calibrated'" class="btn-success"
+                            groups="vmf_hrms.group_vmf_group_hr"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,calibrated,confirmed"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="HIPO" bg_color="bg-success"
+                            invisible="not is_hipo"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="grade_id" readonly="1"/>
+                            <field name="job_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="review_year"/>
+                            <field name="review_date"/>
+                            <field name="reviewed_by" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="9-Box Assessment">
+                        <group>
+                            <field name="performance_rating"/>
+                            <field name="potential_rating"/>
+                            <field name="nine_box_position" readonly="1"/>
+                            <field name="is_hipo" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="retention_risk"/>
+                            <field name="impact_of_loss"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Recommendations">
+                            <field name="recommended_actions" placeholder="Specific development, retention, or recognition actions..."/>
+                        </page>
+                        <page string="Successor Identified For">
+                            <field name="successor_for_role_ids" widget="many2many_tags"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_talent_review_kanban" model="ir.ui.view">
+        <field name="name">vmf.talent.review.kanban</field>
+        <field name="model">vmf.talent.review</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="nine_box_position">
+                <field name="employee_id"/>
+                <field name="nine_box_position"/>
+                <field name="performance_rating"/>
+                <field name="potential_rating"/>
+                <field name="is_hipo"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="employee_id"/></strong>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>Performance: <field name="performance_rating"/></div>
+                                <div>Potential: <field name="potential_rating"/></div>
+                                <div t-if="record.is_hipo.raw_value">
+                                    <span class="badge text-bg-success">HIPO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_vmf_talent_review_search" model="ir.ui.view">
+        <field name="name">vmf.talent.review.search</field>
+        <field name="model">vmf.talent.review</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="review_year"/>
+                <filter name="filter_hipo" string="HIPO Only" domain="[('is_hipo','=',True)]"/>
+                <filter name="filter_high_risk" string="High Retention Risk"
+                        domain="[('retention_risk','=','high')]"/>
+                <filter name="filter_confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
+                <group>
+                    <filter name="group_box" string="9-Box Position" context="{'group_by': 'nine_box_position'}"/>
+                    <filter name="group_year" string="Review Year" context="{'group_by': 'review_year'}"/>
+                    <filter name="group_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_talent_review" model="ir.actions.act_window">
+        <field name="name">Talent Reviews (9-Box)</field>
+        <field name="res_model">vmf.talent.review</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_vmf_talent_review_search"/>
+    </record>
+
+    <!-- Succession Plan -->
+    <record id="view_vmf_succession_plan_list" model="ir.ui.view">
+        <field name="name">vmf.succession.plan.list</field>
+        <field name="model">vmf.succession.plan</field>
+        <field name="arch" type="xml">
+            <list string="Succession Plans"
+                  decoration-success="ready_now_count > 0"
+                  decoration-danger="successor_count == 0">
+                <field name="name"/>
+                <field name="critical_role_id"/>
+                <field name="incumbent_id"/>
+                <field name="department_id"/>
+                <field name="grade_id"/>
+                <field name="successor_count"/>
+                <field name="ready_now_count"/>
+                <field name="last_reviewed"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_succession_plan_form" model="ir.ui.view">
+        <field name="name">vmf.succession.plan.form</field>
+        <field name="model">vmf.succession.plan</field>
+        <field name="arch" type="xml">
+            <form string="Succession Plan">
+                <header>
+                    <button name="action_activate" string="Activate" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_archive_plan" string="Archive" type="object"
+                            invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,archived"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="critical_role_id"/>
+                            <field name="incumbent_id"/>
+                            <field name="company_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="grade_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="review_year"/>
+                            <field name="last_reviewed"/>
+                            <field name="successor_count" readonly="1"/>
+                            <field name="ready_now_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Successors">
+                            <field name="successor_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="candidate_id"/>
+                                    <field name="current_role"/>
+                                    <field name="grade_id"/>
+                                    <field name="readiness"/>
+                                    <field name="is_hipo"/>
+                                    <field name="development_actions"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_succession_plan_search" model="ir.ui.view">
+        <field name="name">vmf.succession.plan.search</field>
+        <field name="model">vmf.succession.plan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="critical_role_id"/>
+                <field name="incumbent_id"/>
+                <filter name="filter_active" string="Active" domain="[('state','=','active')]"/>
+                <filter name="filter_no_ready" string="No Ready-Now Successor"
+                        domain="[('ready_now_count','=',0)]"/>
+                <filter name="filter_critical" string="Critical Roles"
+                        domain="[('is_critical_role','=',True)]"/>
+                <group>
+                    <filter name="group_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_succession_plan" model="ir.actions.act_window">
+        <field name="name">Succession Plans</field>
+        <field name="res_model">vmf.succession.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_vmf_succession_plan_search"/>
+    </record>
+
+    <!-- Skill Gap -->
+    <record id="view_vmf_skill_gap_list" model="ir.ui.view">
+        <field name="name">vmf.skill.gap.list</field>
+        <field name="model">vmf.skill.gap</field>
+        <field name="arch" type="xml">
+            <list string="Skill Gap"
+                  decoration-danger="gap >= 2 and is_critical"
+                  decoration-warning="gap >= 1">
+                <field name="employee_id"/>
+                <field name="competency_id"/>
+                <field name="required_level"/>
+                <field name="current_level"/>
+                <field name="gap"/>
+                <field name="is_critical"/>
+                <field name="recommended_action"/>
+                <field name="assessment_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_skill_gap_form" model="ir.ui.view">
+        <field name="name">vmf.skill.gap.form</field>
+        <field name="model">vmf.skill.gap</field>
+        <field name="arch" type="xml">
+            <form string="Skill Gap">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="competency_id"/>
+                            <field name="is_critical"/>
+                        </group>
+                        <group>
+                            <field name="required_level"/>
+                            <field name="current_level"/>
+                            <field name="gap" readonly="1"/>
+                            <field name="assessment_date"/>
+                        </group>
+                    </group>
+                    <field name="recommended_action"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_skill_gap" model="ir.actions.act_window">
+        <field name="name">Skill Gap</field>
+        <field name="res_model">vmf.skill.gap</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

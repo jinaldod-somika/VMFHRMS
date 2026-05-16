@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_grievance_form" model="ir.ui.view">
+        <field name="name">vmf.grievance.form</field>
+        <field name="model">vmf.grievance</field>
+        <field name="arch" type="xml">
+            <form string="Grievance Case">
+                <header>
+                    <button name="action_investigate" string="Start Investigation" type="object"
+                            invisible="state != 'open'" class="btn-primary"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_resolve" string="Mark Resolved" type="object"
+                            invisible="state != 'under_investigation'"
+                            groups="vmf_hrms.group_vmf_hr_manager" class="btn-success"/>
+                    <button name="action_escalate" string="Escalate" type="object"
+                            invisible="state not in ['open','under_investigation']"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_employee_acknowledge" string="Acknowledge Resolution" type="object"
+                            invisible="state != 'resolved'"/>
+                    <button name="action_withdraw" string="Withdraw" type="object"
+                            invisible="state in ['closed','withdrawn']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="open,under_investigation,resolved,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <span class="badge bg-danger" invisible="sla_breached == False">SLA BREACHED</span>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id" readonly="state != 'open'"/>
+                            <field name="is_anonymous"/>
+                            <field name="grievance_type"/>
+                            <field name="priority"/>
+                        </group>
+                        <group>
+                            <field name="date_filed" readonly="1"/>
+                            <field name="sla_days"/>
+                            <field name="sla_due_date" readonly="1"/>
+                            <field name="case_owner_id"
+                                   groups="vmf_hrms.group_vmf_hr_manager"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="subject"/>
+                        <field name="description"/>
+                        <field name="parties_involved"/>
+                    </group>
+                    <notebook>
+                        <page string="Investigation" groups="vmf_hrms.group_vmf_hr_manager">
+                            <field name="investigation_notes"/>
+                        </page>
+                        <page string="Resolution">
+                            <group>
+                                <field name="resolution"/>
+                                <field name="resolution_date" readonly="1"/>
+                                <field name="employee_acknowledged" readonly="1"/>
+                                <field name="acknowledgement_date" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Escalation">
+                            <group>
+                                <field name="escalated_to_id"/>
+                                <field name="escalation_reason"/>
+                            </group>
+                        </page>
+                        <page string="Notes" groups="vmf_hrms.group_vmf_hr_manager">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_grievance_list" model="ir.ui.view">
+        <field name="name">vmf.grievance.list</field>
+        <field name="model">vmf.grievance</field>
+        <field name="arch" type="xml">
+            <list string="Grievances" decoration-danger="sla_breached == True">
+                <field name="name"/>
+                <field name="employee_id" groups="vmf_hrms.group_vmf_hr_manager"/>
+                <field name="grievance_type"/>
+                <field name="subject"/>
+                <field name="priority"/>
+                <field name="date_filed"/>
+                <field name="sla_due_date"/>
+                <field name="sla_breached" widget="boolean_toggle"/>
+                <field name="case_owner_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'closed'"
+                       decoration-warning="state == 'under_investigation'"
+                       decoration-danger="state == 'escalated'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_grievance" model="ir.actions.act_window">
+        <field name="name">Grievance Cases</field>
+        <field name="res_model">vmf.grievance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

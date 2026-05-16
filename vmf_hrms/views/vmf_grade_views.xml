@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Grade Master Views -->
+    <record id="view_vmf_grade_list" model="ir.ui.view">
+        <field name="name">vmf.grade.list</field>
+        <field name="model">vmf.grade</field>
+        <field name="arch" type="xml">
+            <list string="Grades">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="grade_level"/>
+                <field name="min_salary_usd"/>
+                <field name="max_salary_usd"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_grade_form" model="ir.ui.view">
+        <field name="name">vmf.grade.form</field>
+        <field name="model">vmf.grade</field>
+        <field name="arch" type="xml">
+            <form string="Grade">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                            <field name="grade_level"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="min_salary_usd"/>
+                            <field name="max_salary_usd"/>
+                            <field name="min_salary_inr"/>
+                            <field name="max_salary_inr"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_grade" model="ir.actions.act_window">
+        <field name="name">Grade Master</field>
+        <field name="res_model">vmf.grade</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Airport Views -->
+    <record id="view_vmf_airport_list" model="ir.ui.view">
+        <field name="name">vmf.airport.list</field>
+        <field name="model">vmf.airport</field>
+        <field name="arch" type="xml">
+            <list string="Airports">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="city"/>
+                <field name="country_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_airport_form" model="ir.ui.view">
+        <field name="name">vmf.airport.form</field>
+        <field name="model">vmf.airport</field>
+        <field name="arch" type="xml">
+            <form string="Airport">
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="city"/>
+                        <field name="country_id"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_airport" model="ir.actions.act_window">
+        <field name="name">Airport Master</field>
+        <field name="res_model">vmf.airport</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Cost Center Views -->
+    <record id="view_vmf_cost_center_list" model="ir.ui.view">
+        <field name="name">vmf.cost.center.list</field>
+        <field name="model">vmf.cost.center</field>
+        <field name="arch" type="xml">
+            <list string="Cost Centers">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_cost_center" model="ir.actions.act_window">
+        <field name="name">Cost Centers</field>
+        <field name="res_model">vmf.cost.center</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Business Unit Views -->
+    <record id="view_vmf_business_unit_list" model="ir.ui.view">
+        <field name="name">vmf.business.unit.list</field>
+        <field name="model">vmf.business.unit</field>
+        <field name="arch" type="xml">
+            <list string="Business Units">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_business_unit" model="ir.actions.act_window">
+        <field name="name">Business Units</field>
+        <field name="res_model">vmf.business.unit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend hr.employee form view -->
+    <record id="view_hr_employee_vmf_ext" model="ir.ui.view">
+        <field name="name">hr.employee.vmf.ext</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <!-- Stat buttons -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_travel_requests" type="object"
+                        class="oe_stat_button" icon="fa-plane"
+                        groups="vmf_hrms.group_vmf_hr_manager">
+                    <span class="o_stat_text">Travel Requests</span>
+                </button>
+                <button name="action_view_payslips" type="object"
+                        class="oe_stat_button" icon="fa-file-text-o"
+                        groups="vmf_hrms.group_vmf_payroll">
+                    <span class="o_stat_text">Payslips</span>
+                </button>
+                <button name="action_view_performance_reviews" type="object"
+                        class="oe_stat_button" icon="fa-star"
+                        groups="vmf_hrms.group_vmf_hr_manager">
+                    <span class="o_stat_text">Reviews</span>
+                </button>
+            </xpath>
+            <!-- Employee number below name -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="vmf_employee_number" readonly="1"/>
+            </xpath>
+            <!-- VMG Details tab -->
+            <xpath expr="//page[@name='hr_settings']" position="after">
+                <page string="VMG Details" name="vmg_details">
+                    <group>
+                        <group string="Classification">
+                            <field name="vmf_employee_category"/>
+                            <field name="vmf_grade_id"/>
+                            <field name="vmf_grade_level" readonly="1"/>
+                            <field name="vmf_business_unit_id"/>
+                            <field name="vmf_cost_center_id"/>
+                            <field name="vmf_region_id"/>
+                        </group>
+                        <group string="Travel Entitlement">
+                            <field name="vmf_air_ticket_eligibility"/>
+                            <field name="vmf_rotation_type"/>
+                            <field name="vmf_nearest_airport"/>
+                            <field name="vmf_french_eligible"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Travel Documents" groups="vmf_hrms.group_vmf_hr_manager">
+                            <field name="vmf_passport_number"/>
+                            <field name="vmf_passport_expiry"/>
+                            <field name="vmf_visa_type"/>
+                            <field name="vmf_visa_expiry"/>
+                        </group>
+                        <group string="Employment Dates">
+                            <field name="vmf_probation_end_date"/>
+                            <field name="vmf_confirmation_date"/>
+                            <field name="vmf_contract_end_date"/>
+                        </group>
+                    </group>
+                    <group string="Address">
+                        <group>
+                            <field name="vmf_permanent_address" placeholder="Permanent address (home country)"/>
+                        </group>
+                        <group>
+                            <field name="vmf_current_address" placeholder="Current residential address"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="India Statutory" name="india_statutory"
+                      groups="vmf_hrms.group_vmf_hr_manager">
+                    <group>
+                        <group>
+                            <field name="vmf_pan_number"/>
+                            <field name="vmf_aadhar_number"/>
+                        </group>
+                        <group>
+                            <field name="vmf_uan_number"/>
+                            <field name="vmf_pf_account"/>
+                            <field name="vmf_esi_number"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

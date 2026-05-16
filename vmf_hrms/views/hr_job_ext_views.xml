@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Job Position form with VMG grade fields -->
+    <record id="view_hr_job_form_vmf" model="ir.ui.view">
+        <field name="name">hr.job.form.vmf</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='department_id']" position="after">
+                <field name="grade_id"/>
+                <field name="grade_level" readonly="1"/>
+                <field name="job_level"/>
+                <field name="min_experience_years"/>
+                <field name="is_critical_role"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend Job Position list with grade columns -->
+    <record id="view_hr_job_list_vmf" model="ir.ui.view">
+        <field name="name">hr.job.list.vmf</field>
+        <field name="model">hr.job</field>
+        <field name="inherit_id" ref="hr.view_hr_job_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="grade_id" optional="show"/>
+                <field name="job_level" optional="show"/>
+                <field name="is_critical_role" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Direct action for Job Positions inside VMG Configuration menu -->
+    <record id="action_vmf_hr_job" model="ir.actions.act_window">
+        <field name="name">Job Positions &amp; Grades</field>
+        <field name="res_model">hr.job</field>
+        <field name="view_mode">list,form,kanban</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

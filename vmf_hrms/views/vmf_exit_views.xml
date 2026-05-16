@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_exit_request_form" model="ir.ui.view">
+        <field name="name">vmf.exit.request.form</field>
+        <field name="model">vmf.exit.request</field>
+        <field name="arch" type="xml">
+            <form string="Exit Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_manager_approve" string="Manager Approve" type="object"
+                            invisible="state != 'submitted'"
+                            groups="vmf_hrms.group_vmf_manager"/>
+                    <button name="action_hr_process" string="HR Processing" type="object"
+                            invisible="state != 'manager_approved'"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_compute_ff" string="Compute F&amp;F" type="object"
+                            invisible="state != 'hr_processing'"
+                            groups="vmf_hrms.group_vmf_payroll"/>
+                    <button name="action_approve_ff" string="Approve F&amp;F" type="object"
+                            invisible="state != 'ff_computed'"
+                            groups="vmf_hrms.group_vmf_group_hr"/>
+                    <button name="action_complete" string="Complete Exit" type="object"
+                            invisible="state != 'ff_approved'" class="btn-danger"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,manager_approved,hr_processing,ff_computed,ff_approved,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="company_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="exit_type"/>
+                        </group>
+                        <group>
+                            <field name="resignation_date"/>
+                            <field name="last_working_date"/>
+                            <field name="notice_period_days"/>
+                            <field name="notice_served_days" readonly="1"/>
+                            <field name="notice_shortfall_days" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Clearance Checklist">
+                            <field name="clearance_complete" readonly="1"/>
+                            <field name="clearance_ids">
+                                <list editable="bottom">
+                                    <field name="department_name"/>
+                                    <field name="responsible_id"/>
+                                    <field name="status" widget="badge"
+                                           decoration-success="status == 'cleared'"
+                                           decoration-warning="status == 'in_review'"
+                                           decoration-danger="status == 'hold'"/>
+                                    <field name="cleared_date"/>
+                                    <field name="assets_to_recover"/>
+                                    <field name="amount_to_recover"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Exit Interview">
+                            <group>
+                                <field name="exit_interview_done"/>
+                                <field name="exit_interview_date"/>
+                                <field name="exit_reason_detail"/>
+                                <field name="would_rejoin"/>
+                            </group>
+                        </page>
+                        <page string="F&amp;F Settlement">
+                            <field name="ff_settlement_id" readonly="1"/>
+                        </page>
+                        <page string="Documents">
+                            <group>
+                                <field name="relieving_letter_generated"/>
+                                <field name="experience_letter_generated"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_exit_request_list" model="ir.ui.view">
+        <field name="name">vmf.exit.request.list</field>
+        <field name="model">vmf.exit.request</field>
+        <field name="arch" type="xml">
+            <list string="Exit Requests">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="company_id"/>
+                <field name="exit_type"/>
+                <field name="resignation_date"/>
+                <field name="last_working_date"/>
+                <field name="notice_shortfall_days"/>
+                <field name="clearance_complete"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'completed'"
+                       decoration-warning="state in ['submitted','manager_approved']"
+                       decoration-danger="state == 'ff_computed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_exit_request" model="ir.actions.act_window">
+        <field name="name">Exit Requests</field>
+        <field name="res_model">vmf.exit.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- F&F Settlement -->
+    <record id="view_vmf_ff_settlement_form" model="ir.ui.view">
+        <field name="name">vmf.ff.settlement.form</field>
+        <field name="model">vmf.ff.settlement</field>
+        <field name="arch" type="xml">
+            <form string="F&amp;F Settlement">
+                <header>
+                    <button name="action_approve" string="Approve" type="object"
+                            invisible="state != 'computed'" class="btn-success"
+                            groups="vmf_hrms.group_vmf_group_hr"/>
+                    <button name="action_mark_paid" string="Mark Paid" type="object"
+                            invisible="state != 'approved'"
+                            groups="vmf_hrms.group_vmf_payroll"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,computed,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="last_working_date"/>
+                            <field name="currency_id"/>
+                        </group>
+                    </group>
+                    <group string="Earnings">
+                        <field name="unpaid_salary"/>
+                        <field name="leave_encashment_days"/>
+                        <field name="leave_encashment_amount"/>
+                        <field name="bonus_arrears"/>
+                        <field name="gratuity_amount"/>
+                        <field name="total_earnings" readonly="1"/>
+                    </group>
+                    <group string="Deductions">
+                        <field name="notice_recovery"/>
+                        <field name="advance_recovery"/>
+                        <field name="loan_recovery"/>
+                        <field name="asset_recovery"/>
+                        <field name="other_deductions"/>
+                        <field name="total_deductions" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="net_settlement" readonly="1"/>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_ff_settlement" model="ir.actions.act_window">
+        <field name="name">F&amp;F Settlements</field>
+        <field name="res_model">vmf.ff.settlement</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

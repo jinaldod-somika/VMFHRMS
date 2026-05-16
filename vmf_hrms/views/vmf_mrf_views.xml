@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_mrf_form" model="ir.ui.view">
+        <field name="name">vmf.mrf.form</field>
+        <field name="model">vmf.mrf</field>
+        <field name="arch" type="xml">
+            <form string="Manpower Requisition">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_dept_approve" string="Dept. Approve" type="object"
+                            invisible="state != 'submitted'"
+                            groups="vmf_hrms.group_vmf_manager"/>
+                    <button name="action_hr_approve" string="BU HR Approve" type="object"
+                            invisible="state != 'dept_approved'"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_group_hr_approve" string="Group HR Approve" type="object"
+                            invisible="state != 'hr_approved'"
+                            groups="vmf_hrms.group_vmf_group_hr"/>
+                    <button name="action_budget_approve" string="Budget Approve / Open" type="object"
+                            invisible="state != 'group_hr_approved'"
+                            groups="vmf_hrms.group_vmf_group_hr"/>
+                    <button name="action_hold" string="Put On Hold" type="object"
+                            invisible="state not in ['budget_approved','in_progress']"/>
+                    <button name="action_reopen" string="Reopen" type="object"
+                            invisible="state != 'on_hold'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['cancelled','filled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,dept_approved,hr_approved,group_hr_approved,budget_approved,in_progress,filled"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_candidates" type="object" class="oe_stat_button" icon="fa-users">
+                            <field name="candidate_count" widget="statinfo" string="Candidates"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Position Details">
+                            <field name="company_id"/>
+                            <field name="department_id"/>
+                            <field name="job_id"/>
+                            <field name="grade_id"/>
+                            <field name="business_unit_id"/>
+                            <field name="work_location_id"/>
+                        </group>
+                        <group string="Requisition Details">
+                            <field name="requisition_type"/>
+                            <field name="employment_type"/>
+                            <field name="employee_category"/>
+                            <field name="employment_duration"
+                                   invisible="employment_type != 'contract'"/>
+                            <field name="no_of_positions"/>
+                            <field name="priority"/>
+                            <field name="replacement_employee_id"
+                                   invisible="requisition_type != 'replacement'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Ownership">
+                            <field name="hiring_manager_id"/>
+                            <field name="coordinator_id"/>
+                            <field name="date_target_fill"/>
+                        </group>
+                        <group string="Budget">
+                            <field name="budget_currency_id"/>
+                            <field name="budget_min"/>
+                            <field name="budget_max"/>
+                        </group>
+                    </group>
+                    <group string="Position Age Tracker" invisible="state not in ['budget_approved','in_progress','filled','on_hold']">
+                        <group>
+                            <field name="position_age_days"/>
+                            <field name="hold_days"/>
+                        </group>
+                        <group>
+                            <field name="effective_age_days"/>
+                            <field name="filled_positions"/>
+                            <field name="open_positions"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Job Description">
+                            <field name="justification" placeholder="Business justification for this requisition..."/>
+                            <field name="job_description" widget="html"/>
+                            <field name="skills_required" placeholder="Key skills required..."/>
+                            <field name="qualifications" placeholder="Minimum qualifications..."/>
+                        </page>
+                        <page string="Hold Log">
+                            <field name="hold_line_ids">
+                                <list editable="bottom">
+                                    <field name="hold_start_date"/>
+                                    <field name="hold_end_date"/>
+                                    <field name="hold_reason"/>
+                                    <field name="hold_days"/>
+                                    <field name="resumed_by"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Approval Dates">
+                            <group>
+                                <field name="date_submitted" readonly="1"/>
+                                <field name="date_dept_approved" readonly="1"/>
+                                <field name="date_hr_approved" readonly="1"/>
+                                <field name="date_group_hr_approved" readonly="1"/>
+                                <field name="date_budget_approved" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_mrf_list" model="ir.ui.view">
+        <field name="name">vmf.mrf.list</field>
+        <field name="model">vmf.mrf</field>
+        <field name="arch" type="xml">
+            <list string="Manpower Requisitions" decoration-danger="priority == 'critical'"
+                  decoration-warning="priority == 'normal'" decoration-success="state == 'filled'">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <field name="grade_id"/>
+                <field name="requisition_type"/>
+                <field name="employee_category"/>
+                <field name="priority"/>
+                <field name="no_of_positions"/>
+                <field name="open_positions"/>
+                <field name="hiring_manager_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ['budget_approved','filled']"
+                       decoration-warning="state in ['submitted','dept_approved','hr_approved','group_hr_approved']"
+                       decoration-danger="state in ['cancelled','on_hold']"/>
+                <field name="effective_age_days"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_mrf_kanban" model="ir.ui.view">
+        <field name="name">vmf.mrf.kanban</field>
+        <field name="model">vmf.mrf</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="job_id"/>
+                <field name="grade_id"/>
+                <field name="priority"/>
+                <field name="state"/>
+                <field name="candidate_count"/>
+                <templates>
+                    <t t-name="card">
+                        <strong><field name="name"/></strong>
+                        <div><field name="job_id"/> | <field name="grade_id"/></div>
+                        <div><field name="company_id"/></div>
+                        <footer>
+                            <span class="badge text-bg-info"><field name="candidate_count"/> candidates</span>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_vmf_mrf_search" model="ir.ui.view">
+        <field name="name">vmf.mrf.search</field>
+        <field name="model">vmf.mrf</field>
+        <field name="arch" type="xml">
+            <search string="Search MRF">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+                <filter string="Open" name="open" domain="[('state', 'in', ['budget_approved','in_progress'])]"/>
+                <filter string="Critical Priority" name="critical" domain="[('priority', '=', 'critical')]"/>
+                <separator/>
+                <filter string="By Company" name="by_company" context="{'group_by': 'company_id'}"/>
+                <filter string="By Department" name="by_dept" context="{'group_by': 'department_id'}"/>
+                <filter string="By Status" name="by_state" context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_mrf" model="ir.actions.act_window">
+        <field name="name">Manpower Requisitions</field>
+        <field name="res_model">vmf.mrf</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+</odoo>

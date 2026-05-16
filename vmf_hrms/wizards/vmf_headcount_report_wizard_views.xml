@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_headcount_report_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.headcount.report.wizard.form</field>
+        <field name="model">vmf.headcount.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Headcount Report">
+                <group>
+                    <field name="year"/>
+                    <field name="month"/>
+                    <field name="company_ids" widget="many2many_tags"/>
+                    <field name="overwrite_existing"/>
+                </group>
+                <footer>
+                    <button name="action_generate" type="object" string="Generate Report" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_headcount_report_wizard" model="ir.actions.act_window">
+        <field name="name">Generate Headcount Report</field>
+        <field name="res_model">vmf.headcount.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

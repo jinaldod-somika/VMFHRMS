@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Salary Structure -->
+    <record id="view_vmf_salary_structure_form" model="ir.ui.view">
+        <field name="name">vmf.salary.structure.form</field>
+        <field name="model">vmf.salary.structure</field>
+        <field name="arch" type="xml">
+            <form string="Salary Structure">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="company_id"/>
+                            <field name="currency_id"/>
+                        </group>
+                        <group>
+                            <field name="employee_category"/>
+                            <field name="country_id"/>
+                            <field name="grade_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <field name="line_ids">
+                        <list editable="bottom">
+                            <field name="sequence"/>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="component_type"/>
+                            <field name="computation"/>
+                            <field name="amount"/>
+                            <field name="is_taxable"/>
+                            <field name="appears_on_payslip"/>
+                            <field name="active"/>
+                        </list>
+                    </field>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_salary_structure_list" model="ir.ui.view">
+        <field name="name">vmf.salary.structure.list</field>
+        <field name="model">vmf.salary.structure</field>
+        <field name="arch" type="xml">
+            <list string="Salary Structures">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="company_id"/>
+                <field name="currency_id"/>
+                <field name="employee_category"/>
+                <field name="country_id"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_salary_structure" model="ir.actions.act_window">
+        <field name="name">Salary Structures</field>
+        <field name="res_model">vmf.salary.structure</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Employee Contract -->
+    <record id="view_vmf_employee_contract_form" model="ir.ui.view">
+        <field name="name">vmf.employee.contract.form</field>
+        <field name="model">vmf.employee.contract</field>
+        <field name="arch" type="xml">
+            <form string="Employee Contract">
+                <header>
+                    <button name="action_activate" string="Activate" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_terminate" string="Terminate" type="object"
+                            invisible="state != 'active'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired,terminated"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="employee_id"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="probation_end_date"/>
+                            <field name="notice_period_days"/>
+                        </group>
+                        <group>
+                            <field name="structure_id"/>
+                            <field name="currency_id" readonly="1"/>
+                            <field name="basic_salary"/>
+                            <field name="hra"/>
+                            <field name="accommodation_allowance"/>
+                            <field name="transport_allowance"/>
+                            <field name="annual_leave_allowance"/>
+                            <field name="other_allowance"/>
+                            <field name="gross_salary" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Revision History">
+                            <field name="revision_ids">
+                                <list>
+                                    <field name="effective_date"/>
+                                    <field name="revision_type"/>
+                                    <field name="old_basic"/>
+                                    <field name="new_basic"/>
+                                    <field name="increment_percent"/>
+                                    <field name="reason"/>
+                                    <field name="approved_by"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_employee_contract_list" model="ir.ui.view">
+        <field name="name">vmf.employee.contract.list</field>
+        <field name="model">vmf.employee.contract</field>
+        <field name="arch" type="xml">
+            <list string="Contracts">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="company_id"/>
+                <field name="department_id"/>
+                <field name="grade_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="structure_id"/>
+                <field name="basic_salary"/>
+                <field name="gross_salary"/>
+                <field name="currency_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-danger="state == 'terminated'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_employee_contract" model="ir.actions.act_window">
+        <field name="name">Employee Contracts</field>
+        <field name="res_model">vmf.employee.contract</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Payroll Run -->
+    <record id="view_vmf_payroll_run_form" model="ir.ui.view">
+        <field name="name">vmf.payroll.run.form</field>
+        <field name="model">vmf.payroll.run</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Run">
+                <header>
+                    <button name="action_compute_payroll" string="Compute Payroll" type="object"
+                            invisible="state not in ['draft','computed']" class="btn-primary"/>
+                    <button name="action_review" string="Mark Reviewed" type="object"
+                            invisible="state != 'computed'"/>
+                    <button name="action_approve" string="Approve" type="object"
+                            invisible="state != 'reviewed'" class="btn-success"
+                            groups="vmf_hrms.group_vmf_group_hr"/>
+                    <button name="action_confirm" string="Confirm &amp; Pay" type="object"
+                            invisible="state != 'approved'" class="btn-primary"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['confirmed','cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,computed,reviewed,approved,confirmed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="payroll_month" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_employees" readonly="1"/>
+                            <field name="total_gross" readonly="1"/>
+                            <field name="total_deductions" readonly="1"/>
+                            <field name="total_net" readonly="1"/>
+                            <field name="approved_by" readonly="1"/>
+                            <field name="approved_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Payslips">
+                            <field name="slip_ids" readonly="1">
+                                <list>
+                                    <field name="employee_id"/>
+                                    <field name="department_id"/>
+                                    <field name="grade_id"/>
+                                    <field name="working_days"/>
+                                    <field name="paid_days"/>
+                                    <field name="lop_days"/>
+                                    <field name="basic_pay"/>
+                                    <field name="gross_pay"/>
+                                    <field name="total_deductions"/>
+                                    <field name="net_pay"/>
+                                    <field name="currency_id"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_payroll_run_list" model="ir.ui.view">
+        <field name="name">vmf.payroll.run.list</field>
+        <field name="model">vmf.payroll.run</field>
+        <field name="arch" type="xml">
+            <list string="Payroll Runs">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="payroll_month"/>
+                <field name="total_employees"/>
+                <field name="total_gross"/>
+                <field name="total_deductions"/>
+                <field name="total_net"/>
+                <field name="currency_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'confirmed'"
+                       decoration-warning="state in ['computed','reviewed']"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_vmf_payroll_run" model="ir.actions.act_window">
+        <field name="name">Payroll Runs</field>
+        <field name="res_model">vmf.payroll.run</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Payslip -->
+    <record id="view_vmf_payslip_form" model="ir.ui.view">
+        <field name="name">vmf.payslip.form</field>
+        <field name="model">vmf.payslip</field>
+        <field name="arch" type="xml">
+            <form string="Payslip">
+                <header>
+                    <button name="action_compute" string="Compute" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_print_payslip" string="Print Payslip" type="object"
+                            invisible="state not in ['computed','approved','paid']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,computed,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="contract_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="grade_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="working_days"/>
+                            <field name="paid_days"/>
+                            <field name="lop_days"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="basic_pay"/>
+                            <field name="gross_pay"/>
+                        </group>
+                        <group>
+                            <field name="total_deductions"/>
+                            <field name="net_pay"/>
+                            <field name="currency_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Earnings &amp; Deductions">
+                            <field name="line_ids" readonly="1">
+                                <list decoration-danger="component_type == 'deduction'"
+                                      decoration-success="component_type == 'earning'">
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="component_type"/>
+                                    <field name="amount"/>
+                                    <field name="currency_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_payslip" model="ir.actions.act_window">
+        <field name="name">Payslips</field>
+        <field name="res_model">vmf.payslip</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

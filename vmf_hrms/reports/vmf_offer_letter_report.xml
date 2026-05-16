@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_offer_letter" model="ir.actions.report">
+        <field name="name">Offer Letter</field>
+        <field name="model">vmf.candidate</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vmf_hrms.report_offer_letter</field>
+        <field name="report_file">vmf_hrms.report_offer_letter</field>
+        <field name="binding_model_id" ref="model_vmf_candidate"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_offer_letter">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="cand">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <p class="text-end"><t t-esc="cand.offer_released_date or cand.offer_prepared_date"/></p>
+                        <p>
+                            <strong><t t-esc="cand.candidate_name"/></strong><br/>
+                            <t t-esc="cand.email"/><br/>
+                            <t t-esc="cand.mobile"/>
+                        </p>
+
+                        <h3 class="text-center mt-4">OFFER OF EMPLOYMENT</h3>
+                        <hr/>
+
+                        <p>Dear <t t-esc="cand.candidate_name"/>,</p>
+
+                        <p>
+                            We are pleased to offer you the position of
+                            <strong><t t-esc="cand.job_id.name"/></strong>
+                            at <strong><t t-esc="cand.company_id.name"/></strong>,
+                            in the <strong><t t-esc="cand.department_id.name"/></strong> department,
+                            at Grade <strong><t t-esc="cand.grade_id.name"/></strong>.
+                        </p>
+
+                        <p>
+                            <strong>Compensation:</strong>
+                            <t t-esc="'{:,.0f}'.format(cand.offered_ctc)"/>
+                            <t t-esc="cand.offer_currency_id.name"/> per annum (CTC)
+                        </p>
+
+                        <p>
+                            <strong>Expected Date of Joining:</strong>
+                            <t t-esc="cand.expected_doj"/>
+                        </p>
+
+                        <p>
+                            This offer is contingent upon successful completion of Background Verification,
+                            Medical Clearance, and any applicable Visa / PEC requirements.
+                        </p>
+
+                        <p>
+                            Please confirm your acceptance by signing and returning a copy of this letter
+                            within 7 working days.
+                        </p>
+
+                        <p class="mt-4">
+                            Yours sincerely,<br/><br/><br/>
+                            ____________________________<br/>
+                            Group Human Resources<br/>
+                            <t t-esc="cand.company_id.name"/>
+                        </p>
+
+                        <p class="mt-4">
+                            <em>I accept the above offer of employment.</em><br/><br/>
+                            Signature: ________________________ Date: ___________<br/>
+                        </p>
+
+                        <p class="text-muted" style="font-size: 10px;">
+                            Candidate UID: <t t-esc="cand.name"/> |
+                            Position UID: <t t-esc="cand.mrf_id.name"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
