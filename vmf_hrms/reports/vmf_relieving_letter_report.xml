@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_relieving_letter" model="ir.actions.report">
+        <field name="name">Relieving Letter</field>
+        <field name="model">vmf.exit.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vmf_hrms.report_relieving_letter</field>
+        <field name="report_file">vmf_hrms.report_relieving_letter</field>
+        <field name="binding_model_id" ref="model_vmf_exit_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_relieving_letter">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="exit">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <p class="text-end"><t t-esc="exit.last_working_date"/></p>
+
+                        <p>
+                            <strong>Ref: <t t-esc="exit.name"/></strong>
+                        </p>
+
+                        <p>
+                            <strong><t t-esc="exit.employee_id.name"/></strong><br/>
+                            Employee No: <t t-esc="exit.employee_id.vmf_employee_number"/>
+                        </p>
+
+                        <h3 class="text-center mt-4">RELIEVING LETTER</h3>
+                        <hr/>
+
+                        <p>Dear <t t-esc="exit.employee_id.name"/>,</p>
+
+                        <p>
+                            This is to confirm that you have been employed with
+                            <strong><t t-esc="exit.company_id.name"/></strong>
+                            as <strong><t t-esc="exit.employee_id.job_id.name"/></strong>
+                            in the <strong><t t-esc="exit.department_id.name"/></strong> department.
+                        </p>
+
+                        <p>
+                            You have been relieved from your duties with effect from
+                            <strong><t t-esc="exit.last_working_date"/></strong>,
+                            upon your <t t-esc="exit.exit_type"/>.
+                        </p>
+
+                        <p>
+                            We thank you for your contributions to the organization and wish you
+                            all the best in your future endeavours.
+                        </p>
+
+                        <p class="mt-4">
+                            Yours sincerely,<br/><br/><br/>
+                            ____________________________<br/>
+                            Group Human Resources<br/>
+                            <t t-esc="exit.company_id.name"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

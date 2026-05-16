@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Group Privilege (Odoo 19 style) -->
+    <record id="res_groups_privilege_vmg_hrms" model="res.groups.privilege">
+        <field name="name">VMG HRMS</field>
+        <field name="sequence">20</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+    </record>
+
+    <!-- Groups — ordered from lowest to highest access -->
+    <record id="group_vmf_employee" model="res.groups">
+        <field name="name">Employee (ESS)</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="group_vmf_travel_desk" model="res.groups">
+        <field name="name">Travel Desk Coordinator</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_employee'))]"/>
+        <field name="sequence">15</field>
+    </record>
+
+    <record id="group_vmf_manager" model="res.groups">
+        <field name="name">Manager (MSS)</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_employee'))]"/>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="group_vmf_recruiter" model="res.groups">
+        <field name="name">Recruiter / Talent Acquisition</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_manager'))]"/>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="group_vmf_hr_manager" model="res.groups">
+        <field name="name">Business HR Manager</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_recruiter'))]"/>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="group_vmf_payroll" model="res.groups">
+        <field name="name">Payroll Officer</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="group_vmf_group_hr" model="res.groups">
+        <field name="name">Group HR Director</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(4, ref('group_vmf_payroll'))]"/>
+        <field name="sequence">60</field>
+    </record>
+
+    <record id="group_vmf_auditor" model="res.groups">
+        <field name="name">HR Auditor (Read-Only)</field>
+        <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('base.group_user')])]"/>
+        <field name="sequence">70</field>
+    </record>
+
+    <!-- Record Rules (noupdate) -->
+    <data noupdate="1">
+        <record id="rule_mrf_company" model="ir.rule">
+            <field name="name">MRF: Company-based access</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_mrf"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+        </record>
+
+        <record id="rule_candidate_company" model="ir.rule">
+            <field name="name">Candidate: Company-based access</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_candidate"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_recruiter'))]"/>
+        </record>
+
+        <record id="rule_payslip_payroll_only" model="ir.rule">
+            <field name="name">Payslip: Payroll group company access</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_payslip"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_payroll'))]"/>
+        </record>
+
+        <record id="rule_payslip_own_employee" model="ir.rule">
+            <field name="name">Payslip: Own payslips for ESS</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_payslip"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_employee'))]"/>
+        </record>
+
+        <record id="rule_travel_company" model="ir.rule">
+            <field name="name">Travel: Company-based access</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_travel_request"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+        </record>
+
+        <record id="rule_travel_own_employee" model="ir.rule">
+            <field name="name">Travel: Own requests for ESS</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_travel_request"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_employee'))]"/>
+        </record>
+
+        <record id="rule_grievance_own" model="ir.rule">
+            <field name="name">Grievance: Own cases for ESS</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_grievance"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_employee'))]"/>
+        </record>
+
+        <record id="rule_grievance_company" model="ir.rule">
+            <field name="name">Grievance: Company-based for HR</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_grievance"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager'))]"/>
+        </record>
+    </data>
+</odoo>

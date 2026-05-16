@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vmf_payroll_run_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.payroll.run.wizard.form</field>
+        <field name="model">vmf.payroll.run.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Payroll Run">
+                <group>
+                    <field name="company_id"/>
+                    <field name="year"/>
+                    <field name="month"/>
+                </group>
+                <footer>
+                    <button name="action_create_payroll_run" type="object" string="Create" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_payroll_run_wizard" model="ir.actions.act_window">
+        <field name="name">New Payroll Run</field>
+        <field name="res_model">vmf.payroll.run.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

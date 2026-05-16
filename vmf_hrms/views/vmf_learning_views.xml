@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Course -->
+    <record id="view_vmf_course_list" model="ir.ui.view">
+        <field name="name">vmf.course.list</field>
+        <field name="model">vmf.course</field>
+        <field name="arch" type="xml">
+            <list string="Courses">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="delivery_mode"/>
+                <field name="duration_hours"/>
+                <field name="provider_type"/>
+                <field name="provider_name"/>
+                <field name="cost_per_seat"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="is_mandatory" widget="boolean_toggle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_course_form" model="ir.ui.view">
+        <field name="name">vmf.course.form</field>
+        <field name="model">vmf.course</field>
+        <field name="arch" type="xml">
+            <form string="Course">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_assignments" type="object"
+                                class="oe_stat_button" icon="fa-graduation-cap">
+                            <field name="assignment_count" widget="statinfo" string="Assignments"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Mandatory" bg_color="bg-warning"
+                            invisible="not is_mandatory"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g. Effective Communication"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="delivery_mode"/>
+                            <field name="duration_hours"/>
+                            <field name="provider_type"/>
+                            <field name="provider_name"/>
+                        </group>
+                        <group>
+                            <field name="cost_per_seat"/>
+                            <field name="currency_id"/>
+                            <field name="is_mandatory"/>
+                            <field name="validity_months"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="What participants will learn..."/>
+                        </page>
+                        <page string="Skills &amp; Applicability">
+                            <group>
+                                <field name="skill_ids" widget="many2many_tags"/>
+                                <field name="grade_ids" widget="many2many_tags"/>
+                                <field name="job_ids" widget="many2many_tags"/>
+                                <field name="pre_requisite_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_course_kanban" model="ir.ui.view">
+        <field name="name">vmf.course.kanban</field>
+        <field name="model">vmf.course</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="duration_hours"/>
+                <field name="is_mandatory"/>
+                <field name="delivery_mode"/>
+                <field name="cost_per_seat"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="name"/></strong>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>Category: <field name="category"/></div>
+                                <div>Mode: <field name="delivery_mode"/></div>
+                                <div>Duration: <field name="duration_hours"/> hrs</div>
+                                <div t-if="record.is_mandatory.raw_value">
+                                    <span class="badge text-bg-warning">Mandatory</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_vmf_course_search" model="ir.ui.view">
+        <field name="name">vmf.course.search</field>
+        <field name="model">vmf.course</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="category"/>
+                <field name="provider_name"/>
+                <filter name="filter_mandatory" string="Mandatory" domain="[('is_mandatory','=',True)]"/>
+                <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
+                <separator/>
+                <filter name="filter_internal" string="Internal" domain="[('provider_type','=','internal')]"/>
+                <filter name="filter_external" string="External" domain="[('provider_type','=','external')]"/>
+                <group>
+                    <filter name="group_category" string="Category" context="{'group_by': 'category'}"/>
+                    <filter name="group_mode" string="Delivery Mode" context="{'group_by': 'delivery_mode'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_course" model="ir.actions.act_window">
+        <field name="name">Course Catalog</field>
+        <field name="res_model">vmf.course</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_vmf_course_search"/>
+    </record>
+
+    <!-- Learning Path -->
+    <record id="view_vmf_learning_path_list" model="ir.ui.view">
+        <field name="name">vmf.learning.path.list</field>
+        <field name="model">vmf.learning.path</field>
+        <field name="arch" type="xml">
+            <list string="Learning Paths">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="target_audience"/>
+                <field name="target_grade_id"/>
+                <field name="target_job_id"/>
+                <field name="total_duration_hours"/>
+                <field name="total_cost"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_learning_path_form" model="ir.ui.view">
+        <field name="name">vmf.learning.path.form</field>
+        <field name="model">vmf.learning.path</field>
+        <field name="arch" type="xml">
+            <form string="Learning Path">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="e.g. New Manager Foundations"/></h1>
+                        <h3><field name="code" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="target_audience"/>
+                            <field name="target_grade_id"/>
+                            <field name="target_job_id"/>
+                        </group>
+                        <group>
+                            <field name="total_duration_hours" readonly="1"/>
+                            <field name="total_cost" readonly="1"/>
+                            <field name="currency_id"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Courses">
+                            <field name="course_line_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="course_id"/>
+                                    <field name="category"/>
+                                    <field name="duration_hours"/>
+                                    <field name="is_required"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_learning_path" model="ir.actions.act_window">
+        <field name="name">Learning Paths</field>
+        <field name="res_model">vmf.learning.path</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Course Assignment -->
+    <record id="view_vmf_course_assignment_list" model="ir.ui.view">
+        <field name="name">vmf.course.assignment.list</field>
+        <field name="model">vmf.course.assignment</field>
+        <field name="arch" type="xml">
+            <list string="Course Assignments"
+                  decoration-success="state == 'completed'"
+                  decoration-warning="state == 'in_progress'"
+                  decoration-danger="state == 'failed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="course_id"/>
+                <field name="course_category"/>
+                <field name="assignment_date"/>
+                <field name="target_completion_date"/>
+                <field name="actual_completion_date"/>
+                <field name="score"/>
+                <field name="is_passed" widget="boolean_toggle" optional="show"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_course_assignment_form" model="ir.ui.view">
+        <field name="name">vmf.course.assignment.form</field>
+        <field name="model">vmf.course.assignment</field>
+        <field name="arch" type="xml">
+            <form string="Course Assignment">
+                <header>
+                    <button name="action_start" string="Start" type="object"
+                            invisible="state != 'assigned'" class="btn-primary"/>
+                    <button name="action_complete" string="Mark Completed" type="object"
+                            invisible="state != 'in_progress'" class="btn-success"/>
+                    <button name="action_fail" string="Mark Failed" type="object"
+                            invisible="state not in ['in_progress','completed']"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['completed','cancelled']"/>
+                    <button name="action_reset" string="Reset" type="object"
+                            invisible="state not in ['failed','cancelled']"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="assigned,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="course_id"/>
+                            <field name="course_category" readonly="1"/>
+                            <field name="learning_path_id"/>
+                            <field name="idp_action_id"/>
+                        </group>
+                        <group>
+                            <field name="assigned_by" readonly="1"/>
+                            <field name="assignment_date"/>
+                            <field name="target_completion_date"/>
+                            <field name="actual_completion_date"/>
+                            <field name="days_to_target" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Result">
+                        <group>
+                            <field name="score"/>
+                            <field name="pass_mark"/>
+                            <field name="is_passed" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="effectiveness_rating"/>
+                            <field name="certificate_attachment_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Feedback">
+                            <group>
+                                <field name="feedback_employee" placeholder="Employee feedback after completion..."/>
+                                <field name="feedback_manager" placeholder="Manager observation on application of learning..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_course_assignment_kanban" model="ir.ui.view">
+        <field name="name">vmf.course.assignment.kanban</field>
+        <field name="model">vmf.course.assignment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="course_id"/>
+                <field name="state"/>
+                <field name="target_completion_date"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="course_id"/></strong>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div><field name="employee_id"/></div>
+                                <div t-if="record.target_completion_date.raw_value">
+                                    Target: <field name="target_completion_date"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_vmf_course_assignment_search" model="ir.ui.view">
+        <field name="name">vmf.course.assignment.search</field>
+        <field name="model">vmf.course.assignment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="course_id"/>
+                <field name="department_id"/>
+                <filter name="filter_my" string="My Courses"
+                        domain="[('employee_id.user_id','=',uid)]"/>
+                <filter name="filter_team" string="My Team"
+                        domain="[('employee_id.parent_id.user_id','=',uid)]"/>
+                <separator/>
+                <filter name="filter_assigned" string="Assigned" domain="[('state','=','assigned')]"/>
+                <filter name="filter_in_progress" string="In Progress" domain="[('state','=','in_progress')]"/>
+                <filter name="filter_completed" string="Completed" domain="[('state','=','completed')]"/>
+                <filter name="filter_overdue" string="Overdue"
+                        domain="[('target_completion_date','&lt;', context_today().strftime('%Y-%m-%d')),('state','in',['assigned','in_progress'])]"/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_employee" string="Employee" context="{'group_by': 'employee_id'}"/>
+                    <filter name="group_course" string="Course" context="{'group_by': 'course_id'}"/>
+                    <filter name="group_department" string="Department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_course_assignment" model="ir.actions.act_window">
+        <field name="name">Course Assignments</field>
+        <field name="res_model">vmf.course.assignment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_vmf_course_assignment_search"/>
+    </record>
+
+    <record id="action_vmf_my_courses" model="ir.actions.act_window">
+        <field name="name">My Courses</field>
+        <field name="res_model">vmf.course.assignment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('employee_id.user_id','=',uid)]</field>
+        <field name="context">{'search_default_filter_my': 1}</field>
+    </record>
+</odoo>

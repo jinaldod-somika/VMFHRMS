@@ -1,0 +1,165 @@
+/* VMG HRMS Image-Matched Dashboard Styles */
+:root {
+    --vmf-maroon: #7b435b;
+    --vmf-blue: #0084ff;
+    --vmf-green: #28a745;
+    --vmf-navy: #2c3e50;
+    --vmf-orange: #f39c12;
+    --vmf-pink: #c2185b;
+    --vmf-light-bg: #f4f7f6;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.vmf_dashboard_container {
+    padding: 20px;
+    background: var(--vmf-light-bg);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.vmf_dashboard_header {
+    margin-bottom: 20px;
+}
+
+.vmf_dashboard_header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+}
+
+/* KPI Card Row */
+.vmf_kpi_row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    overflow-x: auto;
+}
+
+.vmf_kpi_card {
+    flex: 1;
+    min-width: 180px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-top: 4px solid #ccc;
+    padding: 15px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
+}
+
+.vmf_kpi_card:hover {
+    transform: translateY(-2px);
+}
+
+.vmf_kpi_card.headcount { border-top-color: var(--vmf-maroon); }
+.vmf_kpi_card.mrf { border-top-color: var(--vmf-blue); }
+.vmf_kpi_card.attrition { border-top-color: var(--vmf-green); }
+.vmf_kpi_card.payroll { border-top-color: var(--vmf-navy); }
+.vmf_kpi_card.travel { border-top-color: var(--vmf-orange); }
+.vmf_kpi_card.hipo { border-top-color: var(--vmf-pink); }
+
+.vmf_kpi_label {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.vmf_kpi_value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.vmf_kpi_subtext {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.vmf_kpi_subtext.up { color: #28a745; }
+.vmf_kpi_subtext.down { color: #dc3545; }
+.vmf_kpi_subtext.neutral { color: #888; }
+
+/* Charts Box */
+.vmf_chart_box {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    height: 100%;
+    box-shadow: var(--card-shadow);
+}
+
+.vmf_chart_box h5 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+/* Horizontal Bar Styles */
+.vmf_bar_row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.vmf_bar_label {
+    width: 120px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.vmf_bar_container {
+    flex-grow: 1;
+    height: 35px;
+    background: #eee;
+    position: relative;
+    margin-left: 10px;
+}
+
+.vmf_bar_fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Funnel Colors */
+.vmf_bar_fill.sourced { background: #7b435b; width: 100%; }
+.vmf_bar_fill.screened { background: #0084ff; width: 60%; }
+.vmf_bar_fill.interviewed { background: #28a745; width: 45%; }
+.vmf_bar_fill.selected { background: #f39c12; width: 30%; }
+.vmf_bar_fill.offered { background: #2c3e50; width: 25%; }
+.vmf_bar_fill.joined { background: #c2185b; width: 15%; }
+
+/* Headcount Category Colors (Alternating) */
+.vmf_bar_fill.cat0 { background: #7b435b; }
+.vmf_bar_fill.cat1 { background: #c2185b; }
+.vmf_bar_fill.cat2 { background: #0084ff; }
+.vmf_bar_fill.cat3 { background: #36b9cc; }
+.vmf_bar_fill.cat4 { background: #2c3e50; }
+
+/* Footer Alert */
+.vmf_footer_alert {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    padding: 15px;
+    margin-top: 25px;
+    border-radius: 4px;
+}
+
+.vmf_footer_alert p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #856404;
+    font-weight: 600;
+}
+
+.vmf_footer_subtext {
+    font-size: 0.8rem;
+    color: #9a7d2e;
+}

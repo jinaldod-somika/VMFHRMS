@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Travel Agent -->
+    <record id="view_vmf_travel_agent_list" model="ir.ui.view">
+        <field name="name">vmf.travel.agent.list</field>
+        <field name="model">vmf.travel.agent</field>
+        <field name="arch" type="xml">
+            <list string="Travel Agents">
+                <field name="name"/>
+                <field name="contact_person"/>
+                <field name="phone"/>
+                <field name="email"/>
+                <field name="applicable_routes"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_travel_agent_form" model="ir.ui.view">
+        <field name="name">vmf.travel.agent.form</field>
+        <field name="model">vmf.travel.agent</field>
+        <field name="arch" type="xml">
+            <form string="Travel Agent">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="e.g. Balaji Tour &amp; Travels"/></h1>
+                    </div>
+                    <group>
+                        <group string="Contact">
+                            <field name="contact_person"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                        <group string="Coverage">
+                            <field name="applicable_routes"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_travel_agent" model="ir.actions.act_window">
+        <field name="name">Travel Agents</field>
+        <field name="res_model">vmf.travel.agent</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Travel Request -->
+    <record id="view_vmf_travel_request_form" model="ir.ui.view">
+        <field name="name">vmf.travel.request.form</field>
+        <field name="model">vmf.travel.request</field>
+        <field name="arch" type="xml">
+            <form string="Travel Request">
+                <header>
+                    <button name="action_submit" string="Submit" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_manager_approve" string="Manager Approve" type="object"
+                            invisible="state != 'submitted'"
+                            groups="vmf_hrms.group_vmf_manager"/>
+                    <button name="action_hr_approve" string="HR Approve" type="object"
+                            invisible="state != 'manager_approved'"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_send_to_travel_desk" string="Send to Travel Desk" type="object"
+                            invisible="state != 'hr_approved'"
+                            groups="vmf_hrms.group_vmf_hr_manager"/>
+                    <button name="action_book" string="Confirm Booking" type="object"
+                            invisible="state != 'travel_desk'"
+                            groups="vmf_hrms.group_vmf_travel_desk" class="btn-success"/>
+                    <button name="action_mark_travelled" string="Mark Travelled" type="object"
+                            invisible="state != 'booked'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['travelled','cancelled']"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,manager_approved,hr_approved,travel_desk,booked,travelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group string="Traveller">
+                            <field name="company_id"/>
+                            <field name="employee_id"/>
+                            <field name="traveller_type"/>
+                            <field name="family_member_name" invisible="traveller_type == 'employee'"/>
+                            <field name="relation" invisible="traveller_type == 'employee'"/>
+                        </group>
+                        <group string="Trip Details">
+                            <field name="travel_purpose"/>
+                            <field name="flight_type"/>
+                            <field name="trip_type"/>
+                            <field name="expected_departure_date"/>
+                            <field name="expected_return_date" invisible="trip_type == 'one_way'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Route">
+                            <field name="origin_airport_id"/>
+                            <field name="via_airport_id"/>
+                            <field name="destination_airport_id"/>
+                            <field name="route_description" readonly="1"/>
+                        </group>
+                        <group string="Visa / Passport" invisible="flight_type == 'domestic'">
+                            <field name="passport_number" readonly="1"/>
+                            <field name="passport_expiry" readonly="1"/>
+                            <field name="visa_type"/>
+                            <field name="visa_status"/>
+                            <field name="visa_application_date"/>
+                            <field name="visa_received_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Agent Quotations" groups="vmf_hrms.group_vmf_travel_desk">
+                            <field name="quotation_ids">
+                                <list editable="bottom" decoration-success="is_lowest == True"
+                                      decoration-primary="is_selected == True">
+                                    <field name="agent_id"/>
+                                    <field name="quoted_amount"/>
+                                    <field name="currency_id" readonly="1"/>
+                                    <field name="airlines"/>
+                                    <field name="ticket_class"/>
+                                    <field name="validity_date"/>
+                                    <field name="is_lowest" readonly="1" widget="boolean_toggle"/>
+                                    <field name="is_selected" readonly="1" widget="boolean_toggle"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                            <group>
+                                <field name="selected_quotation_id"/>
+                                <field name="selection_justification"/>
+                            </group>
+                        </page>
+                        <page string="Ticket Details" invisible="state not in ['booked','travelled']">
+                            <group>
+                                <group>
+                                    <field name="ticket_number"/>
+                                    <field name="pnr_number"/>
+                                    <field name="airline"/>
+                                    <field name="ticket_class"/>
+                                    <field name="ticket_issue_date"/>
+                                </group>
+                                <group>
+                                    <field name="dummy_ticket"/>
+                                    <field name="dummy_ticket_pnr" invisible="dummy_ticket == False"/>
+                                    <field name="actual_departure_date"/>
+                                    <field name="actual_return_date"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Cost">
+                            <group>
+                                <group>
+                                    <field name="international_cost"/>
+                                    <field name="domestic_cost"/>
+                                    <field name="seat_charges"/>
+                                    <field name="overall_cost" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="employee_cost_share"/>
+                                    <field name="company_cost_share" readonly="1"/>
+                                    <field name="currency_id"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_vmf_travel_request_list" model="ir.ui.view">
+        <field name="name">vmf.travel.request.list</field>
+        <field name="model">vmf.travel.request</field>
+        <field name="arch" type="xml">
+            <list string="Travel Requests" decoration-warning="state == 'travel_desk'">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="company_id"/>
+                <field name="travel_purpose"/>
+                <field name="traveller_type"/>
+                <field name="flight_type"/>
+                <field name="trip_type"/>
+                <field name="route_description"/>
+                <field name="expected_departure_date"/>
+                <field name="expected_return_date"/>
+                <field name="booking_agent_id"/>
+                <field name="overall_cost"/>
+                <field name="currency_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state in ['booked','travelled']"
+                       decoration-warning="state == 'travel_desk'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_travel_request_search" model="ir.ui.view">
+        <field name="name">vmf.travel.request.search</field>
+        <field name="model">vmf.travel.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="company_id"/>
+                <filter string="Pending Booking" name="pending_booking" domain="[('state','=','travel_desk')]"/>
+                <filter string="Upcoming" name="upcoming" domain="[('state','=','booked')]"/>
+                <filter string="Travelled" name="travelled" domain="[('state','=','travelled')]"/>
+                <group>
+                    <filter string="Company" name="by_company" context="{'group_by': 'company_id'}"/>
+                    <filter string="Purpose" name="by_purpose" context="{'group_by': 'travel_purpose'}"/>
+                    <filter string="Status" name="by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_vmf_travel_request" model="ir.actions.act_window">
+        <field name="name">Travel Requests</field>
+        <field name="res_model">vmf.travel.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_vmf_travel_desk_queue" model="ir.actions.act_window">
+        <field name="name">Travel Desk Queue</field>
+        <field name="res_model">vmf.travel.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ['hr_approved', 'travel_desk'])]</field>
+    </record>
+</odoo>

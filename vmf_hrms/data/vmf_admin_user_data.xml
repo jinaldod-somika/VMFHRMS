@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Grant the system admin all VMG HRMS roles so the full menu tree
+         is visible out of the box. group_vmf_group_hr is the highest tier
+         and implies every lower-tier VMG group through implied_ids. -->
+    <record id="base.user_admin" model="res.users">
+        <field name="group_ids" eval="[
+            (4, ref('vmf_hrms.group_vmf_group_hr')),
+            (4, ref('vmf_hrms.group_vmf_payroll')),
+            (4, ref('vmf_hrms.group_vmf_travel_desk')),
+        ]"/>
+    </record>
+</odoo>

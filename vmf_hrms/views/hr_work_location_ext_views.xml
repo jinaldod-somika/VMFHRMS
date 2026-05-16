@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Work Location list with VMG fields -->
+    <record id="view_hr_work_location_list_vmf" model="ir.ui.view">
+        <field name="name">hr.work.location.list.vmf</field>
+        <field name="model">hr.work.location</field>
+        <field name="inherit_id" ref="hr.hr_work_location_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="vmf_location_code" string="Code"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="vmf_region_id" string="Region" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend Work Location form with VMG fields -->
+    <record id="view_hr_work_location_form_vmf" model="ir.ui.view">
+        <field name="name">hr.work.location.form.vmf</field>
+        <field name="model">hr.work.location</field>
+        <field name="inherit_id" ref="hr.hr_work_location_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="vmf_location_code" placeholder="e.g. SOM-KIP"/>
+            </xpath>
+            <xpath expr="//field[@name='address_id']" position="after">
+                <field name="vmf_region_id"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Notes">
+                    <field name="vmf_notes" nolabel="1" colspan="2"
+                           placeholder="Notes about this work location..."/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Region Master Views -->
+    <record id="view_vmf_region_list" model="ir.ui.view">
+        <field name="name">vmf.region.list</field>
+        <field name="model">vmf.region</field>
+        <field name="arch" type="xml">
+            <list string="Regions">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_vmf_region_form" model="ir.ui.view">
+        <field name="name">vmf.region.form</field>
+        <field name="model">vmf.region</field>
+        <field name="arch" type="xml">
+            <form string="Region">
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_region" model="ir.actions.act_window">
+        <field name="name">Regions</field>
+        <field name="res_model">vmf.region</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

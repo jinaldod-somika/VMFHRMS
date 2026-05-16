@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend Department form with VMG fields -->
+    <record id="view_hr_department_form_vmf" model="ir.ui.view">
+        <field name="name">hr.department.form.vmf</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="vmf_department_code" placeholder="e.g. HR, FIN, OPS"/>
+                <field name="vmf_business_unit_id"/>
+                <field name="vmf_cost_center_id"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Notes">
+                    <field name="vmf_notes" nolabel="1" colspan="2"
+                           placeholder="Notes about this department..."/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend Department list with code -->
+    <record id="view_hr_department_list_vmf" model="ir.ui.view">
+        <field name="name">hr.department.list.vmf</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="vmf_department_code" string="Code" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="vmf_business_unit_id" string="Business Unit" optional="show"/>
+                <field name="vmf_cost_center_id" string="Cost Center" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

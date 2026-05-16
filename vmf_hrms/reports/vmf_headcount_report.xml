@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_headcount" model="ir.actions.report">
+        <field name="name">Headcount Report</field>
+        <field name="model">vmf.headcount.snapshot</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">vmf_hrms.report_headcount</field>
+        <field name="report_file">vmf_hrms.report_headcount</field>
+        <field name="binding_model_id" ref="model_vmf_headcount_snapshot"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_headcount">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 class="text-center">HEADCOUNT REPORT</h2>
+                    <h4 class="text-center text-muted">
+                        <t t-esc="docs[0].snapshot_month if docs else ''"/>
+                    </h4>
+                    <table class="table table-sm table-bordered mt-3">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Company</th>
+                                <th class="text-center">Expat Permanent</th>
+                                <th class="text-center">Expat Contractual</th>
+                                <th class="text-center">National Permanent</th>
+                                <th class="text-center">National Contractual</th>
+                                <th class="text-center">Security / Agency</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center">Prior Month</th>
+                                <th class="text-center">Variance</th>
+                                <th class="text-center">Var %</th>
+                                <th class="text-center">Ratio (E:N)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="snap">
+                                <tr>
+                                    <td><t t-esc="snap.company_id.name"/></td>
+                                    <td class="text-center"><t t-esc="snap.expat_permanent"/></td>
+                                    <td class="text-center"><t t-esc="snap.expat_contractual"/></td>
+                                    <td class="text-center"><t t-esc="snap.national_permanent"/></td>
+                                    <td class="text-center"><t t-esc="snap.national_contractual"/></td>
+                                    <td class="text-center"><t t-esc="snap.security_agency"/></td>
+                                    <td class="text-center fw-bold"><t t-esc="snap.total_headcount"/></td>
+                                    <td class="text-center"><t t-esc="snap.prior_month_total"/></td>
+                                    <td class="text-center">
+                                        <t t-esc="snap.variance"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <t t-esc="'{:.1f}%'.format(snap.variance_pct)"/>
+                                    </td>
+                                    <td class="text-center"><t t-esc="snap.expat_national_ratio"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                        <tfoot class="table-secondary fw-bold">
+                            <tr>
+                                <td>GROUP TOTAL</td>
+                                <td class="text-center"><t t-esc="sum(s.expat_permanent for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.expat_contractual for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.national_permanent for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.national_contractual for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.security_agency for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.total_headcount for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.prior_month_total for s in docs)"/></td>
+                                <td class="text-center"><t t-esc="sum(s.variance for s in docs)"/></td>
+                                <td class="text-center">—</td>
+                                <td class="text-center">—</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="mt-4" t-if="any(s.deviation_justification for s in docs)">
+                        <h5>Deviation Justification</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Variance</th>
+                                    <th>Justification</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="docs.filtered(lambda s: s.deviation_justification)" t-as="snap">
+                                    <tr>
+                                        <td><t t-esc="snap.company_id.name"/></td>
+                                        <td><t t-esc="snap.variance"/></td>
+                                        <td><t t-esc="snap.deviation_justification"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <p class="text-muted mt-4" style="font-size: 10px;">
+                        Generated by VMG HRMS | <t t-esc="docs[0].snapshot_month if docs else ''"/>
+                        | Confidential
+                    </p>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

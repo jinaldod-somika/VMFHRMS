@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- India Airports -->
+    <record id="airport_bom" model="vmf.airport">
+        <field name="code">BOM</field>
+        <field name="name">Chhatrapati Shivaji Maharaj International Airport</field>
+        <field name="city">Mumbai</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_del" model="vmf.airport">
+        <field name="code">DEL</field>
+        <field name="name">Indira Gandhi International Airport</field>
+        <field name="city">New Delhi</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_pat" model="vmf.airport">
+        <field name="code">PAT</field>
+        <field name="name">Jay Prakash Narayan International Airport</field>
+        <field name="city">Patna</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_bbi" model="vmf.airport">
+        <field name="code">BBI</field>
+        <field name="name">Biju Patnaik International Airport</field>
+        <field name="city">Bhubaneswar</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_vtz" model="vmf.airport">
+        <field name="code">VTZ</field>
+        <field name="name">Visakhapatnam Airport</field>
+        <field name="city">Visakhapatnam</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_ixg" model="vmf.airport">
+        <field name="code">IXG</field>
+        <field name="name">Hubli Airport</field>
+        <field name="city">Hubli</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_jrg" model="vmf.airport">
+        <field name="code">JRG</field>
+        <field name="name">Jharsuguda Airport</field>
+        <field name="city">Jharsuguda</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_hsr" model="vmf.airport">
+        <field name="code">HSR</field>
+        <field name="name">Hisar Airport</field>
+        <field name="city">Hisar</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_gop" model="vmf.airport">
+        <field name="code">GOP</field>
+        <field name="name">Gorakhpur Airport</field>
+        <field name="city">Gorakhpur</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_maa" model="vmf.airport">
+        <field name="code">MAA</field>
+        <field name="name">Chennai International Airport</field>
+        <field name="city">Chennai</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_blr" model="vmf.airport">
+        <field name="code">BLR</field>
+        <field name="name">Kempegowda International Airport</field>
+        <field name="city">Bangalore</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_hyd" model="vmf.airport">
+        <field name="code">HYD</field>
+        <field name="name">Rajiv Gandhi International Airport</field>
+        <field name="city">Hyderabad</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+    <record id="airport_ccu" model="vmf.airport">
+        <field name="code">CCU</field>
+        <field name="name">Netaji Subhas Chandra Bose International Airport</field>
+        <field name="city">Kolkata</field>
+        <field name="country_id" ref="base.in"/>
+    </record>
+
+    <!-- DRC / Africa Airports -->
+    <record id="airport_fih" model="vmf.airport">
+        <field name="code">FIH</field>
+        <field name="name">N'djili International Airport</field>
+        <field name="city">Kinshasa</field>
+        <field name="country_id" ref="base.cd"/>
+    </record>
+    <record id="airport_flw" model="vmf.airport">
+        <field name="code">FKI</field>
+        <field name="name">Bangoka International Airport</field>
+        <field name="city">Kisangani</field>
+        <field name="country_id" ref="base.cd"/>
+    </record>
+    <record id="airport_lub" model="vmf.airport">
+        <field name="code">LUB</field>
+        <field name="name">Lubumbashi International Airport</field>
+        <field name="city">Lubumbashi</field>
+        <field name="country_id" ref="base.cd"/>
+    </record>
+    <record id="airport_kmn" model="vmf.airport">
+        <field name="code">KMN</field>
+        <field name="name">Kamina Airport</field>
+        <field name="city">Kamina</field>
+        <field name="country_id" ref="base.cd"/>
+    </record>
+    <record id="airport_nbo" model="vmf.airport">
+        <field name="code">NBO</field>
+        <field name="name">Jomo Kenyatta International Airport</field>
+        <field name="city">Nairobi</field>
+        <field name="country_id" ref="base.ke"/>
+    </record>
+    <record id="airport_add" model="vmf.airport">
+        <field name="code">ADD</field>
+        <field name="name">Addis Ababa Bole International Airport</field>
+        <field name="city">Addis Ababa</field>
+        <field name="country_id" ref="base.et"/>
+    </record>
+
+    <!-- Dubai -->
+    <record id="airport_dxb" model="vmf.airport">
+        <field name="code">DXB</field>
+        <field name="name">Dubai International Airport</field>
+        <field name="city">Dubai</field>
+        <field name="country_id" ref="base.ae"/>
+    </record>
+
+    <!-- Canada -->
+    <record id="airport_yyz" model="vmf.airport">
+        <field name="code">YYZ</field>
+        <field name="name">Toronto Pearson International Airport</field>
+        <field name="city">Toronto</field>
+        <field name="country_id" ref="base.ca"/>
+    </record>
+</odoo>

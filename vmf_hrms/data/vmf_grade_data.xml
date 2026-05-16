@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Workmen Grades W1-W4 -->
+    <record id="grade_w1" model="vmf.grade">
+        <field name="name">W1</field>
+        <field name="description">Workman Grade 1 — Entry Level</field>
+        <field name="grade_level">workmen</field>
+        <field name="sequence">1</field>
+        <field name="min_salary_usd">200</field>
+        <field name="max_salary_usd">350</field>
+    </record>
+    <record id="grade_w2" model="vmf.grade">
+        <field name="name">W2</field>
+        <field name="description">Workman Grade 2 — Junior</field>
+        <field name="grade_level">workmen</field>
+        <field name="sequence">2</field>
+        <field name="min_salary_usd">300</field>
+        <field name="max_salary_usd">500</field>
+    </record>
+    <record id="grade_w3" model="vmf.grade">
+        <field name="name">W3</field>
+        <field name="description">Workman Grade 3 — Experienced</field>
+        <field name="grade_level">workmen</field>
+        <field name="sequence">3</field>
+        <field name="min_salary_usd">450</field>
+        <field name="max_salary_usd">700</field>
+    </record>
+    <record id="grade_w4" model="vmf.grade">
+        <field name="name">W4</field>
+        <field name="description">Workman Grade 4 — Senior Workman</field>
+        <field name="grade_level">workmen</field>
+        <field name="sequence">4</field>
+        <field name="min_salary_usd">600</field>
+        <field name="max_salary_usd">900</field>
+    </record>
+
+    <!-- Supervisory Grades S1-S5 -->
+    <record id="grade_s1" model="vmf.grade">
+        <field name="name">S1</field>
+        <field name="description">Supervisor Grade 1 — Junior Supervisor</field>
+        <field name="grade_level">supervisory</field>
+        <field name="sequence">5</field>
+        <field name="min_salary_usd">800</field>
+        <field name="max_salary_usd">1200</field>
+    </record>
+    <record id="grade_s2" model="vmf.grade">
+        <field name="name">S2</field>
+        <field name="description">Supervisor Grade 2</field>
+        <field name="grade_level">supervisory</field>
+        <field name="sequence">6</field>
+        <field name="min_salary_usd">1000</field>
+        <field name="max_salary_usd">1600</field>
+    </record>
+    <record id="grade_s3" model="vmf.grade">
+        <field name="name">S3</field>
+        <field name="description">Supervisor Grade 3 — Senior Supervisor</field>
+        <field name="grade_level">supervisory</field>
+        <field name="sequence">7</field>
+        <field name="min_salary_usd">1400</field>
+        <field name="max_salary_usd">2200</field>
+    </record>
+    <record id="grade_s4" model="vmf.grade">
+        <field name="name">S4</field>
+        <field name="description">Supervisor Grade 4 — Lead Supervisor</field>
+        <field name="grade_level">supervisory</field>
+        <field name="sequence">8</field>
+        <field name="min_salary_usd">1800</field>
+        <field name="max_salary_usd">2800</field>
+    </record>
+    <record id="grade_s5" model="vmf.grade">
+        <field name="name">S5</field>
+        <field name="description">Supervisor Grade 5 — Senior Lead</field>
+        <field name="grade_level">supervisory</field>
+        <field name="sequence">9</field>
+        <field name="min_salary_usd">2200</field>
+        <field name="max_salary_usd">3500</field>
+    </record>
+
+    <!-- Management Grades M1-M12 -->
+    <record id="grade_m1" model="vmf.grade">
+        <field name="name">M1</field>
+        <field name="description">Management Grade 1 — Assistant Manager</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">10</field>
+        <field name="min_salary_usd">3000</field>
+        <field name="max_salary_usd">4500</field>
+    </record>
+    <record id="grade_m2" model="vmf.grade">
+        <field name="name">M2</field>
+        <field name="description">Management Grade 2 — Manager</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">11</field>
+        <field name="min_salary_usd">4000</field>
+        <field name="max_salary_usd">6000</field>
+    </record>
+    <record id="grade_m3" model="vmf.grade">
+        <field name="name">M3</field>
+        <field name="description">Management Grade 3 — Senior Manager</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">12</field>
+        <field name="min_salary_usd">5500</field>
+        <field name="max_salary_usd">8000</field>
+    </record>
+    <record id="grade_m4" model="vmf.grade">
+        <field name="name">M4</field>
+        <field name="description">Management Grade 4 — Deputy General Manager</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">13</field>
+        <field name="min_salary_usd">7000</field>
+        <field name="max_salary_usd">10000</field>
+    </record>
+    <record id="grade_m5" model="vmf.grade">
+        <field name="name">M5</field>
+        <field name="description">Management Grade 5 — General Manager</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">14</field>
+        <field name="min_salary_usd">9000</field>
+        <field name="max_salary_usd">13000</field>
+    </record>
+    <record id="grade_m6" model="vmf.grade">
+        <field name="name">M6</field>
+        <field name="description">Management Grade 6 — Senior General Manager</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">15</field>
+        <field name="min_salary_usd">11000</field>
+        <field name="max_salary_usd">16000</field>
+    </record>
+    <record id="grade_m7" model="vmf.grade">
+        <field name="name">M7</field>
+        <field name="description">Management Grade 7 — VP / Head of Function</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">16</field>
+        <field name="min_salary_usd">14000</field>
+        <field name="max_salary_usd">20000</field>
+    </record>
+    <record id="grade_m8" model="vmf.grade">
+        <field name="name">M8</field>
+        <field name="description">Management Grade 8 — Director</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">17</field>
+        <field name="min_salary_usd">18000</field>
+        <field name="max_salary_usd">25000</field>
+    </record>
+    <record id="grade_m9" model="vmf.grade">
+        <field name="name">M9</field>
+        <field name="description">Management Grade 9 — Senior Director</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">18</field>
+        <field name="min_salary_usd">22000</field>
+        <field name="max_salary_usd">32000</field>
+    </record>
+    <record id="grade_m10" model="vmf.grade">
+        <field name="name">M10</field>
+        <field name="description">Management Grade 10 — Executive Director</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">19</field>
+        <field name="min_salary_usd">28000</field>
+        <field name="max_salary_usd">40000</field>
+    </record>
+    <record id="grade_m11" model="vmf.grade">
+        <field name="name">M11</field>
+        <field name="description">Management Grade 11 — C-Suite</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">20</field>
+        <field name="min_salary_usd">35000</field>
+        <field name="max_salary_usd">55000</field>
+    </record>
+    <record id="grade_m12" model="vmf.grade">
+        <field name="name">M12</field>
+        <field name="description">Management Grade 12 — Group Leadership</field>
+        <field name="grade_level">management</field>
+        <field name="sequence">21</field>
+        <field name="min_salary_usd">50000</field>
+        <field name="max_salary_usd">100000</field>
+    </record>
+</odoo>
