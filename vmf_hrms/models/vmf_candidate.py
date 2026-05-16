@@ -3,6 +3,7 @@ from odoo.tools.translate import _
 from datetime import date
 
 
+
 SOURCING_CHANNELS = [
     ('karmaa', 'Karmaa'),
     ('referral', 'Referral'),
