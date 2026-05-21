@@ -7,3 +7,5 @@ from . import test_headcount
 from . import test_master_data
 from . import test_learning
 from . import test_talent
+from . import test_performance
+

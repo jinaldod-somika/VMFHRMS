@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1st Round Invitation Template -->
+        <record id="email_template_vmf_interview_1_invitation" model="mail.template">
+            <field name="name">Interview Round 1: Invitation</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_candidate"/>
+            <field name="subject">Invitation for Interview - Round 1: {{ object.candidate_name }}</field>
+            <field name="email_from">{{ (object.coordinator_id.work_email or object.company_id.email or 'hr@example.com') }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.candidate_name or ''">Candidate</t>,<br/><br/>
+                        We are pleased to invite you for the <strong>1st Round Interview</strong> for the position of <strong><t t-out="object.job_id.name or ''">Job Position</t></strong>.
+                        <br/><br/>
+                        <strong>Interview Details:</strong><br/>
+                        <ul>
+                            <li><strong>Date:</strong> <t t-out="object.interview1_date or ''"/></li>
+                            <li><strong>HR Interviewer:</strong> <t t-out="object.interview1_hr_interviewer_id.name or ''"/></li>
+                            <li><strong>Panel Members:</strong> <t t-out="', '.join(object.interview1_interviewer_ids.mapped('name')) or ''"/></li>
+                            <t t-if="object.interview1_google_meet_link">
+                                <li><strong>Meeting Link:</strong> <a t-att-href="object.interview1_google_meet_link" target="_blank"><t t-out="object.interview1_google_meet_link"/></a></li>
+                            </t>
+                        </ul>
+                        <br/>
+                        Best regards,<br/>
+                        <t t-out="object.coordinator_id.name or 'Recruitment Team'"></t><br/>
+                        <t t-out="object.company_id.name"></t>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- 2nd Round Invitation Template -->
+        <record id="email_template_vmf_interview_2_invitation" model="mail.template">
+            <field name="name">Interview Round 2: Invitation</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_candidate"/>
+            <field name="subject">Invitation for Interview - Round 2: {{ object.candidate_name }}</field>
+            <field name="email_from">{{ (object.coordinator_id.work_email or object.company_id.email or 'hr@example.com') }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.candidate_name or ''">Candidate</t>,<br/><br/>
+                        Congratulations on clearing the first round! We would like to invite you for the <strong>2nd Round Interview</strong>.
+                        <br/><br/>
+                        <strong>Interview Details:</strong><br/>
+                        <ul>
+                            <li><strong>Date:</strong> <t t-out="object.interview2_date or ''"/></li>
+                            <li><strong>HR Interviewer:</strong> <t t-out="object.interview2_hr_interviewer_id.name or ''"/></li>
+                            <li><strong>Panel Members:</strong> <t t-out="', '.join(object.interview2_interviewer_ids.mapped('name')) or ''"/></li>
+                            <t t-if="object.interview2_google_meet_link">
+                                <li><strong>Meeting Link:</strong> <a t-att-href="object.interview2_google_meet_link" target="_blank"><t t-out="object.interview2_google_meet_link"/></a></li>
+                            </t>
+                        </ul>
+                        <br/>
+                        Best regards,<br/>
+                        <t t-out="object.coordinator_id.name or 'Recruitment Team'"></t><br/>
+                        <t t-out="object.company_id.name"></t>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- 3rd Round Invitation Template -->
+        <record id="email_template_vmf_interview_3_invitation" model="mail.template">
+            <field name="name">Interview Round 3: Invitation</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_candidate"/>
+            <field name="subject">Invitation for Interview - Round 3: {{ object.candidate_name }}</field>
+            <field name="email_from">{{ (object.coordinator_id.work_email or object.company_id.email or 'hr@example.com') }}</field>
+            <field name="email_to">{{ object.email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.candidate_name or ''">Candidate</t>,<br/><br/>
+                        We are moving forward with your application. You are invited for the <strong>Final Round Interview (Round 3)</strong>.
+                        <br/><br/>
+                        <strong>Interview Details:</strong><br/>
+                        <ul>
+                            <li><strong>Date:</strong> <t t-out="object.interview3_date or ''"/></li>
+                            <li><strong>HR Interviewer:</strong> <t t-out="object.interview3_hr_interviewer_id.name or ''"/></li>
+                            <li><strong>Panel Members:</strong> <t t-out="', '.join(object.interview3_interviewer_ids.mapped('name')) or ''"/></li>
+                            <t t-if="object.interview3_google_meet_link">
+                                <li><strong>Meeting Link:</strong> <a t-att-href="object.interview3_google_meet_link" target="_blank"><t t-out="object.interview3_google_meet_link"/></a></li>
+                            </t>
+                        </ul>
+                        <br/>
+                        Best regards,<br/>
+                        <t t-out="object.coordinator_id.name or 'Recruitment Team'"></t><br/>
+                        <t t-out="object.company_id.name"></t>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Goal Submitted Template -->
+        <record id="mail_template_vmf_goal_submitted" model="mail.template">
+            <field name="name">Goal: Submitted to HOD 1</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="subject">Goal Approval Request: {{ object.employee_id.name }} has submitted Goals</field>
+            <field name="email_from">{{ (object.employee_id.work_email or 'hr@example.com') }}</field>
+            <field name="email_to">{{ object.manager_id.work_email }}</field>
+            <field name="email_cc">{{ object.employee_id.work_email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.manager_id.name or 'HOD 1'"/>,<br/><br/>
+                        An employee in your department, <strong><t t-out="object.employee_id.name"/></strong>, has submitted their Goal plan for your review and approval.
+                        <br/><br/>
+                        <strong>Goal Details:</strong><br/>
+                        <ul>
+                            <li><strong>Goal Name:</strong> <t t-out="object.name"/></li>
+                            <li><strong>Goal Statement:</strong> <t t-out="object.statement"/></li>
+                            <li><strong>Weightage:</strong> <t t-out="object.weight"/>%</li>
+                            <li><strong>BSC Perspective:</strong> <t t-out="dict(object._fields['bsc_perspective'].selection).get(object.bsc_perspective)"/></li>
+                        </ul>
+                        <br/>
+                        Please log in to the VMG portal to review the goal, add your comments to the milestones, and approve it.
+                        <br/><br/>
+                        Best regards,<br/>
+                        HR Department<br/>
+                        <t t-out="object.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Goal HOD 1 Approved Template -->
+        <record id="mail_template_vmf_goal_hod1_approved" model="mail.template">
+            <field name="name">Goal: HOD 1 Approved</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="subject">Goal Approval Request: {{ object.employee_id.name }} has been HOD 1 Approved</field>
+            <field name="email_from">{{ (object.manager_id.work_email or 'hr@example.com') }}</field>
+            <field name="email_to">{{ object.hod2_id.work_email }}</field>
+            <field name="email_cc">{{ object.employee_id.work_email }},{{ object.manager_id.work_email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.hod2_id.name or 'HOD 2'"/>,<br/><br/>
+                        This is to inform you that the Goal Plan for <strong><t t-out="object.employee_id.name"/></strong> has been approved by their Manager / HOD 1 (<strong><t t-out="object.manager_id.name"/></strong>) and is now submitted to you for the final (2nd) approval.
+                        <br/><br/>
+                        <strong>Goal Details:</strong><br/>
+                        <ul>
+                            <li><strong>Goal Name:</strong> <t t-out="object.name"/></li>
+                            <li><strong>Goal Statement:</strong> <t t-out="object.statement"/></li>
+                            <li><strong>Weightage:</strong> <t t-out="object.weight"/>%</li>
+                            <li><strong>BSC Perspective:</strong> <t t-out="dict(object._fields['bsc_perspective'].selection).get(object.bsc_perspective)"/></li>
+                        </ul>
+                        <br/>
+                        Please log in to the VMG portal to review the goal, add your comments to the milestones, and finalize the approval.
+                        <br/><br/>
+                        Best regards,<br/>
+                        HR Department<br/>
+                        <t t-out="object.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Goal Achieved Template -->
+        <record id="mail_template_vmf_goal_achieved" model="mail.template">
+            <field name="name">Goal: Achieved</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="subject">Goal Achieved / Approved: {{ object.employee_id.name }}</field>
+            <field name="email_from">{{ (object.hod2_id.work_email or 'hr@example.com') }}</field>
+            <field name="email_to">{{ object.employee_id.work_email }}</field>
+            <field name="email_cc">{{ object.manager_id.work_email }},{{ object.hod2_id.work_email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.employee_id.name"/>,<br/><br/>
+                        Congratulations! Your Goal plan has been fully approved by HOD 2 (<strong><t t-out="object.hod2_id.name"/></strong>) and is now marked as <strong>Achieved</strong>.
+                        <br/><br/>
+                        <strong>Goal Details:</strong><br/>
+                        <ul>
+                            <li><strong>Goal Name:</strong> <t t-out="object.name"/></li>
+                            <li><strong>Goal Statement:</strong> <t t-out="object.statement"/></li>
+                            <li><strong>Weightage:</strong> <t t-out="object.weight"/>%</li>
+                            <li><strong>BSC Perspective:</strong> <t t-out="dict(object._fields['bsc_perspective'].selection).get(object.bsc_perspective)"/></li>
+                        </ul>
+                        <br/>
+                        You can view the full record and comments by logging in to the VMG portal.
+                        <br/><br/>
+                        Best regards,<br/>
+                        HR Department<br/>
+                        <t t-out="object.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+        <!-- Goal Rejected Template -->
+        <record id="mail_template_vmf_goal_rejected" model="mail.template">
+            <field name="name">Goal: Rejected / Modification Needed</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="subject">Goal Plan Returned: Modification Needed for {{ object.employee_id.name }}</field>
+            <field name="email_from">hr@example.com</field>
+            <field name="email_to">{{ object.employee_id.work_email }}</field>
+            <field name="email_cc">{{ object.manager_id.work_email }},{{ object.hod2_id.work_email }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        Dear <t t-out="object.employee_id.name"/>,<br/><br/>
+                        Your submitted Goal plan has been returned for modifications and has been reset to <strong>Draft</strong> state.
+                        <br/><br/>
+                        <strong>Goal Details:</strong><br/>
+                        <ul>
+                            <li><strong>Goal Name:</strong> <t t-out="object.name"/></li>
+                            <li><strong>Goal Statement:</strong> <t t-out="object.statement"/></li>
+                            <li><strong>Weightage:</strong> <t t-out="object.weight"/>%</li>
+                            <li><strong>BSC Perspective:</strong> <t t-out="dict(object._fields['bsc_perspective'].selection).get(object.bsc_perspective)"/></li>
+                        </ul>
+                        <br/>
+                        Please log in to the VMG portal, review any comments, modify your goal plan details or milestones, and resubmit it for approval.
+                        <br/><br/>
+                        Best regards,<br/>
+                        HR Department<br/>
+                        <t t-out="object.company_id.name"/>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

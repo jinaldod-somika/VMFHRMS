@@ -176,4 +176,68 @@
         <field name="target">new</field>
         <field name="context">{'default_candidate_id': active_id}</field>
     </record>
+
+    <!-- Invitation Wizard -->
+    <record id="view_vmf_candidate_invitation_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.invitation.wizard.form</field>
+        <field name="model">vmf.candidate.invitation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Interview Invitation">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="round_number"/>
+                        <field name="email" placeholder="e.g. candidate@email.com"/>
+                        <field name="interview_date"/>
+                        <field name="hr_interviewer_id"/>
+                        <field name="interviewer_ids" widget="many2many_tags"/>
+                        <field name="google_meet_link" placeholder="e.g. https://meet.google.com/abc-defg-hij" widget="url"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_invitation" string="Send Invitation" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_invitation_wizard" model="ir.actions.act_window">
+        <field name="name">Send Interview Invitation</field>
+        <field name="res_model">vmf.candidate.invitation.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
+
+    <!-- Feedback Wizard -->
+    <record id="view_vmf_candidate_feedback_wizard_form" model="ir.ui.view">
+        <field name="name">vmf.candidate.feedback.wizard.form</field>
+        <field name="model">vmf.candidate.feedback.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Interview Feedback">
+                <sheet>
+                    <group>
+                        <field name="candidate_id"/>
+                        <field name="round_number"/>
+                        <field name="result"/>
+                        <field name="feedback"/>
+                        <field name="remarks"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_feedback" string="Save Feedback" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_vmf_candidate_feedback_wizard" model="ir.actions.act_window">
+        <field name="name">Interview Feedback</field>
+        <field name="res_model">vmf.candidate.feedback.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_candidate_id': active_id}</field>
+    </record>
 </odoo>

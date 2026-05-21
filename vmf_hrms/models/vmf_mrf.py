@@ -9,12 +9,15 @@ class VmfMRF(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
     _rec_name = 'name'
+    _rec_names_search = ['name', 'job_id.name', 'department_id.name']
 
     name = fields.Char('Position UID', readonly=True, copy=False, default='Draft')
     company_id = fields.Many2one('res.company', string='Company', required=True,
                                  default=lambda self: self.env.company, tracking=True)
-    department_id = fields.Many2one('hr.department', string='Department', required=True, tracking=True)
-    job_id = fields.Many2one('hr.job', string='Designation / Job Position', required=True, tracking=True)
+    department_id = fields.Many2one('hr.department', string='Department', required=True, tracking=True,
+                                   domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    job_id = fields.Many2one('hr.job', string='Designation / Job Position', required=True, tracking=True,
+                             domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     grade_id = fields.Many2one('vmf.grade', string='Grade', tracking=True)
     business_unit_id = fields.Many2one('vmf.business.unit', string='Business Unit')
     work_location_id = fields.Many2one('hr.work.location', string='Work Location')
@@ -109,6 +112,8 @@ class VmfMRF(models.Model):
     job_description = fields.Html('Job Description')
     skills_required = fields.Text('Skills Required')
     qualifications = fields.Text('Qualifications Required')
+    jd_document = fields.Binary(string='JD Document', attachment=True, tracking=True)
+    jd_document_name = fields.Char(string='JD Document Name')
 
     # Hold tracking
     hold_line_ids = fields.One2many('vmf.mrf.hold', 'mrf_id', string='Hold Log')
@@ -119,12 +124,43 @@ class VmfMRF(models.Model):
 
     notes = fields.Text('Internal Notes')
 
+    @api.onchange('job_id')
+    def _onchange_job_id(self):
+        if self.job_id:
+            self.grade_id = self.job_id.grade_id
+        else:
+            self.grade_id = False
+
+    def _compute_display_name(self):
+        for rec in self:
+            parts = [rec.name]
+            if rec.job_id:
+                parts.append(rec.job_id.name)
+            rec.display_name = ' — '.join(parts) if len(parts) > 1 else (rec.name or 'Draft')
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', 'Draft') == 'Draft':
                 vals['name'] = self.env['ir.sequence'].next_by_code('vmf.mrf') or 'Draft'
         return super().create(vals_list)
+
+    def unlink(self):
+        """Only allow deletion of MRFs that are still in Draft state,
+        unless the user is a Group HR Director who may delete any MRF.
+        All other roles (HR Manager, Recruiter, MSS Manager) are blocked
+        from deleting MRFs that have already entered the approval workflow.
+        """
+        is_group_hr_director = self.env.user.has_group('vmf_hrms.group_vmf_group_hr')
+        if not is_group_hr_director:
+            non_draft = self.filtered(lambda mrf: mrf.state != 'draft')
+            if non_draft:
+                raise exceptions.UserError(_(
+                    'You cannot delete a Manpower Requisition that has been submitted or approved.\n\n'
+                    'The following MRF(s) cannot be deleted: %s\n\n'
+                    'Please cancel the MRF instead.'
+                ) % ', '.join(non_draft.mapped('name')))
+        return super().unlink()
 
     @api.depends('candidate_ids', 'candidate_ids.state')
     def _compute_filled_positions(self):

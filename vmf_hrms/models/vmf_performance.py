@@ -26,32 +26,161 @@ class VmfGoalPlan(models.Model):
         self.message_post(body=_('Goal plan published. Employees may now acknowledge their goals.'))
 
 
+from odoo.exceptions import ValidationError
+
 class VmfGoal(models.Model):
     _name = 'vmf.goal'
     _description = 'Performance Goal / KPI'
-    _order = 'sequence'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'id desc'
 
-    plan_id = fields.Many2one('vmf.goal.plan', string='Goal Plan', ondelete='cascade')
-    name = fields.Char('Goal / KPI Description', required=True)
-    sequence = fields.Integer('Sequence', default=10)
-    weight = fields.Float('Weightage (%)', default=20)
-    target_value = fields.Float('Target Value')
-    target_unit = fields.Char('Unit of Measure')
-    applicable_to = fields.Selection([
-        ('all', 'All Employees'),
-        ('grade', 'By Grade'),
-        ('department', 'By Department'),
-        ('function', 'By Function'),
-    ], string='Applicable To', default='all')
-    grade_id = fields.Many2one('vmf.grade', string='Grade')
-    department_id = fields.Many2one('hr.department', string='Department')
-    category = fields.Selection([
+    plan_id = fields.Many2one('vmf.goal.plan', string='Goal Plan', ondelete='cascade', required=False)
+    employee_id = fields.Many2one('hr.employee', string='Employee', required=True, default=lambda self: self.env.user.employee_id)
+    manager_id = fields.Many2one('hr.employee', related='employee_id.parent_id', store=True, string='Manager (HOD 1)')
+    hod2_id = fields.Many2one('hr.employee', related='employee_id.vmf_hod2_id', store=True, string='HOD 2')
+    company_id = fields.Many2one('res.company', related='employee_id.company_id', store=True, string='Company')
+    department_id = fields.Many2one('hr.department', related='employee_id.department_id', store=True, string='Department')
+    job_id = fields.Many2one('hr.job', related='employee_id.job_id', store=True, string='Job Position')
+
+    name = fields.Char('Goal Name', required=True, tracking=True)
+    statement = fields.Text('Goal Statement', required=True, tracking=True)
+    weight = fields.Float('Weightage (%)', required=True, default=20.0, tracking=True)
+
+    start_date = fields.Date('Start Date', required=True, default=fields.Date.context_today, tracking=True)
+    target_date = fields.Date('Target Date', required=True, default=fields.Date.context_today, tracking=True)
+
+    bsc_perspective = fields.Selection([
         ('financial', 'Financial'),
-        ('operational', 'Operational'),
         ('customer', 'Customer'),
-        ('people', 'People & Development'),
-        ('safety', 'Safety & Compliance'),
-    ], string='Category')
+        ('process', 'Internal Process'),
+        ('learning', 'Learning & Growth'),
+    ], string='BSC Perspective', required=True, default='financial', tracking=True)
+
+    success_measure = fields.Text('Success Measure Details', required=True)
+    comments = fields.Text('Add Your Comments')
+
+    review_frequency = fields.Selection([
+        ('monthly', 'Monthly'),
+        ('quarterly', 'Quarterly'),
+        ('half_yearly', 'Half-Yearly'),
+        ('annual', 'Annual'),
+    ], string='Frequency of Review', required=True, default='annual', tracking=True)
+
+    milestone_not_sure = fields.Boolean('I am not sure as of now')
+    milestone_ids = fields.One2many('vmf.goal.milestone', 'goal_id', string='Milestones')
+
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted to HOD 1'),
+        ('hod1_approved', 'HOD 1 Approved'),
+        ('achieved', 'Achieved'),
+        ('cancelled', 'Cancelled'),
+    ], string='Status', default='draft', tracking=True)
+
+    def write(self, vals):
+        is_privileged = self.env.su or \
+                        self.env.user.id == 1 or \
+                        self.env.user._is_system() or \
+                        self.env.user.has_group('vmf_hrms.group_vmf_manager') or \
+                        self.env.user.has_group('vmf_hrms.group_vmf_hr_manager') or \
+                        self.env.user.has_group('vmf_hrms.group_vmf_group_hr') or \
+                        self.env.user.has_group('base.group_system')
+        for rec in self:
+            # Block any edits (except status transitions) once in Achieved stage
+            if rec.state == 'achieved':
+                if any(k != 'state' for k in vals.keys()):
+                    raise ValidationError(_("You cannot edit a goal that has been achieved."))
+
+            is_privileged_rec = is_privileged or \
+                                (rec.manager_id and rec.manager_id.user_id == self.env.user) or \
+                                (rec.hod2_id and rec.hod2_id.user_id == self.env.user)
+            if rec.state != 'draft' and not is_privileged_rec:
+                if any(k != 'state' for k in vals.keys()):
+                    raise ValidationError(_("You cannot edit a goal after it has been submitted."))
+        return super().write(vals)
+
+    def action_submit(self):
+        for rec in self:
+            if not rec.manager_id:
+                raise ValidationError(_("No Manager (HOD 1) is defined for this employee. Please contact HR."))
+            rec.write({'state': 'submitted'})
+            rec.message_post(body=_("Goal submitted to HOD 1 (Manager) for approval."))
+            
+            # Send Email to HOD 1
+            template = self.env.ref('vmf_hrms.mail_template_vmf_goal_submitted', raise_if_not_found=False)
+            if template:
+                template.sudo().send_mail(rec.id, force_send=True)
+
+    def action_hod1_approve(self):
+        for rec in self:
+            if not rec.manager_id:
+                raise ValidationError(_("No Manager (HOD 1) is defined for this employee."))
+            
+            # Milestone Validation
+            if not rec.milestone_not_sure:
+                if not rec.milestone_ids:
+                    raise ValidationError(_("You must have at least one milestone or select 'I am not sure as of now'."))
+                for ms in rec.milestone_ids:
+                    if not ms.hod1_comment or not ms.hod1_comment.strip():
+                        raise ValidationError(_("Please add HOD 1 comments in milestones before approving."))
+
+            rec.write({'state': 'hod1_approved'})
+            rec.message_post(body=_("HOD 1 (Manager) approved the goal plan and submitted to HOD 2."))
+
+            # Send Email to HOD 2
+            template = self.env.ref('vmf_hrms.mail_template_vmf_goal_hod1_approved', raise_if_not_found=False)
+            if template:
+                template.sudo().send_mail(rec.id, force_send=True)
+
+    def action_hod2_approve(self):
+        for rec in self:
+            if not rec.hod2_id:
+                raise ValidationError(_("No HOD 2 is defined for this employee. Please assign an HOD 2."))
+            
+            # Milestone Validation
+            if not rec.milestone_not_sure:
+                if not rec.milestone_ids:
+                    raise ValidationError(_("You must have at least one milestone or select 'I am not sure as of now'."))
+                for ms in rec.milestone_ids:
+                    if not ms.hod2_comment or not ms.hod2_comment.strip():
+                        raise ValidationError(_("Please add HOD 2 comments in milestones before approving."))
+
+            rec.write({'state': 'achieved'})
+            rec.message_post(body=_("HOD 2 approved the goal plan. State is now Achieved."))
+
+            # Send Final Email to Employee
+            template = self.env.ref('vmf_hrms.mail_template_vmf_goal_achieved', raise_if_not_found=False)
+            if template:
+                template.sudo().send_mail(rec.id, force_send=True)
+
+    def action_reject(self):
+        for rec in self:
+            if rec.state not in ['submitted', 'hod1_approved']:
+                raise ValidationError(_("Only submitted or HOD 1 approved goals can be rejected."))
+            rec.write({'state': 'draft'})
+            rec.message_post(body=_("Goal plan has been rejected and sent back to draft for modification."))
+
+            # Send Email to Employee
+            template = self.env.ref('vmf_hrms.mail_template_vmf_goal_rejected', raise_if_not_found=False)
+            if template:
+                template.sudo().send_mail(rec.id, force_send=True)
+
+    def action_cancel(self):
+        self.write({'state': 'cancelled'})
+
+
+class VmfGoalMilestone(models.Model):
+    _name = 'vmf.goal.milestone'
+    _description = 'Goal Milestone'
+    _order = 'id asc'
+
+    goal_id = fields.Many2one('vmf.goal', string='Goal', required=True, ondelete='cascade')
+    measure = fields.Char('Milestone Measures', required=True)
+    description = fields.Text('Description', required=True)
+    completion_date = fields.Date('Completion Date', required=True)
+    hod1_comment = fields.Text('HOD 1 Comment')
+    hod2_comment = fields.Text('HOD 2 Comment')
+
 
 
 class VmfPerformanceReview(models.Model):

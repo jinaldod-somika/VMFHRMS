@@ -17,6 +17,7 @@ class VmfCompetency(models.Model):
     _name = 'vmf.competency'
     _description = 'Competency'
     _order = 'category, name'
+    _rec_names_search = ['name', 'code']
 
     name = fields.Char('Competency Name', required=True)
     code = fields.Char('Code')
@@ -31,6 +32,10 @@ class VmfCompetency(models.Model):
     skill_id = fields.Many2one('hr.skill', string='Linked Skill',
         help='Optional link to the standard Odoo skill catalog.')
     active = fields.Boolean('Active', default=True)
+
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name
 
 
 class VmfCompetencyMatrix(models.Model):

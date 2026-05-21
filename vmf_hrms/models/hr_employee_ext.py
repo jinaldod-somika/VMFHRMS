@@ -6,22 +6,56 @@ import re
 
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
+    _rec_names_search = ['name', 'vmf_employee_number']
 
-    # Overriding base fields to grant read access to Auditor
-    # Note: These fields are originally restricted to hr_holidays.group_hr_holidays_user
-    # Overriding base fields to grant read access to Auditor
-    # Note: These fields are originally restricted to hr_holidays.group_hr_holidays_user and hr.group_hr_user
-    current_leave_id = fields.Many2one('hr.leave.type', groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
-    current_leave_state = fields.Selection(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
-    leave_date_from = fields.Date(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
-    leave_date_to = fields.Date(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
-    is_absent = fields.Boolean(groups="hr.group_hr_user,hr_holidays.group_hr_holidays_user,vmf_hrms.group_vmf_auditor")
+    # Clean and robust override of field access for Auditor and general fields
+    @api.model
+    def _has_field_access(self, field, operation):
+        # 1. Allow HR Auditor full read access to all standard HR-protected fields
+        if operation == 'read':
+            auditor_group = self.env.ref('vmf_hrms.group_vmf_auditor', raise_if_not_found=False)
+            if auditor_group and auditor_group in self.env.user.sudo().group_ids:
+                hr_groups = {
+                    'hr.group_hr_user',
+                    'hr.group_hr_manager',
+                    'hr_holidays.group_hr_holidays_user',
+                    'hr_payroll.group_hr_payroll_user',
+                    'hr_recruitment.group_hr_recruitment_user',
+                    'vmf_hrms.group_vmf_hr_manager',
+                    'vmf_hrms.group_vmf_payroll'
+                }
+                if field.groups and any(g in field.groups for g in hr_groups):
+                    return True
 
-    # Overriding standard field to remove group restriction (allows users like k k to read it)
-    exceptional_location_id = fields.Many2one('hr.work.location', groups=False)
+
+        # 2. Allow general users read access to standard employee fields to prevent view/form crashes
+        if operation == 'read':
+            # Whitelist custom/specific fields and any field restricted to standard HR Officers
+            if field.name in ('exceptional_location_id', 'employee_properties', 'version_id', 'current_version_id') or \
+               (field.groups and 'hr.group_hr_user' in field.groups):
+                return True
+
+        # 3. Allow standard employees read access to their own sensitive fields
+        if operation == 'read' and self and len(self) == 1 and self.id == self.env.user.employee_id.id:
+            return True
+
+
+
+        return super()._has_field_access(field, operation)
 
     # Employee number sequence
     vmf_employee_number = fields.Char('Employee Number', copy=False, readonly=True)
+
+    # Computed field to control visibility of sensitive details (statutory, travel, address)
+    vmf_show_sensitive_data = fields.Boolean(compute='_compute_vmf_show_sensitive_data', string='Show Sensitive Data')
+
+    def _compute_vmf_show_sensitive_data(self):
+        is_privileged = self.env.user.has_group('vmf_hrms.group_vmf_hr_manager') or \
+                        self.env.user.has_group('vmf_hrms.group_vmf_payroll') or \
+                        self.env.user.has_group('vmf_hrms.group_vmf_auditor') or \
+                        self.env.user._is_admin()
+        for rec in self:
+            rec.vmf_show_sensitive_data = is_privileged or (rec.user_id and rec.user_id == self.env.user)
 
     # Employee category
     vmf_employee_category = fields.Selection([
@@ -129,6 +163,10 @@ class HrEmployee(models.Model):
         ('no_rotation', 'No Rotation'),
     ], string='Rotation Type')
 
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.vmf_employee_number}" if rec.vmf_employee_number else rec.name
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -174,11 +212,16 @@ class HrEmployee(models.Model):
 
 class HrDepartment(models.Model):
     _inherit = 'hr.department'
+    _rec_names_search = ['name', 'vmf_department_code']
 
     vmf_department_code = fields.Char('Department Code')
     vmf_cost_center_id = fields.Many2one('vmf.cost.center', string='Default Cost Center')
     vmf_business_unit_id = fields.Many2one('vmf.business.unit', string='Business Unit')
     vmf_notes = fields.Text('Notes')
+
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.vmf_department_code}" if rec.vmf_department_code else rec.name
 
     @api.constrains('vmf_department_code', 'company_id')
     def _check_vmf_department_code_unique(self):
@@ -200,6 +243,7 @@ class VmfAirport(models.Model):
     _name = 'vmf.airport'
     _description = 'Airport Master'
     _order = 'code'
+    _rec_names_search = ['name', 'code']
 
     code = fields.Char('IATA Code', required=True, size=3)
     name = fields.Char('Airport Name', required=True)
@@ -211,5 +255,6 @@ class VmfAirport(models.Model):
         ('code_uniq', 'unique(code)', 'Airport IATA code must be unique!'),
     ]
 
-    def name_get(self):
-        return [(rec.id, f"{rec.code} — {rec.name}") for rec in self]
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name

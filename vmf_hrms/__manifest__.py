@@ -55,6 +55,7 @@ Covers:
         'data/vmf_grade_data.xml',
         'data/vmf_airport_data.xml',
         'data/vmf_admin_user_data.xml',
+        'data/vmf_mail_template_data.xml',
         # Wizards (must be before menu)
         'wizards/vmf_payroll_run_wizard_views.xml',
         'wizards/vmf_headcount_report_wizard_views.xml',

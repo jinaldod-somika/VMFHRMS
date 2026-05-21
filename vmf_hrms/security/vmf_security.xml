@@ -32,29 +32,33 @@
     <record id="group_vmf_recruiter" model="res.groups">
         <field name="name">Recruiter / Talent Acquisition</field>
         <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
-        <field name="implied_ids" eval="[(4, ref('group_vmf_manager'))]"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('group_vmf_employee')])]"/>
         <field name="sequence">30</field>
     </record>
 
     <record id="group_vmf_hr_manager" model="res.groups">
         <field name="name">Business HR Manager</field>
         <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
-        <field name="implied_ids" eval="[(4, ref('group_vmf_recruiter')), (4, ref('group_vmf_travel_desk')), (4, ref('hr.group_hr_user'))]"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('group_vmf_recruiter'), ref('group_vmf_travel_desk'), ref('hr.group_hr_user'), ref('group_vmf_manager')])]"/>
         <field name="sequence">40</field>
     </record>
 
     <record id="group_vmf_payroll" model="res.groups">
         <field name="name">Payroll Officer</field>
         <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
-        <field name="implied_ids" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_travel_desk'))]"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('group_vmf_employee'), ref('group_vmf_travel_desk'), ref('om_hr_payroll.group_hr_payroll_manager')])]"/>
         <field name="sequence">50</field>
     </record>
 
     <record id="group_vmf_group_hr" model="res.groups">
         <field name="name">Group HR Director</field>
         <field name="privilege_id" ref="res_groups_privilege_vmg_hrms"/>
-        <field name="implied_ids" eval="[(4, ref('group_vmf_payroll'))]"/>
+        <field name="implied_ids" eval="[(6, 0, [ref('group_vmf_payroll'), ref('group_vmf_hr_manager')])]"/>
         <field name="sequence">60</field>
+    </record>
+
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_vmf_group_hr'))]"/>
     </record>
 
     <record id="group_vmf_auditor" model="res.groups">
@@ -70,14 +74,14 @@
             <field name="name">MRF: Company-based access</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_mrf"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_auditor'))]"/>
+            <field name="groups" eval="[(5, 0, 0)]"/>
         </record>
 
         <record id="rule_candidate_company" model="ir.rule">
             <field name="name">Candidate: Company-based access</field>
             <field name="model_id" ref="vmf_hrms.model_vmf_candidate"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
-            <field name="groups" eval="[(4, ref('group_vmf_recruiter')), (4, ref('group_vmf_auditor'))]"/>
+            <field name="groups" eval="[(5, 0, 0)]"/>
         </record>
 
         <record id="rule_payslip_payroll_only" model="ir.rule">
@@ -120,6 +124,114 @@
             <field name="model_id" ref="vmf_hrms.model_vmf_grievance"/>
             <field name="domain_force">[('company_id', 'in', company_ids)]</field>
             <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_auditor'))]"/>
+        </record>
+
+        <record id="rule_pip_own_employee" model="ir.rule">
+            <field name="name">PIP: Own plans for ESS</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_pip"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_employee'))]"/>
+        </record>
+
+        <record id="rule_pip_company" model="ir.rule">
+            <field name="name">PIP: Company-based for HR</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_pip"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_auditor'))]"/>
+        </record>
+
+        <record id="rule_pip_manager" model="ir.rule">
+            <field name="name">PIP: Subordinates plans for Manager</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_pip"/>
+            <field name="domain_force">[('manager_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_manager'))]"/>
+        </record>
+
+        <!-- Admin absolute bypass rules -->
+        <record id="rule_payslip_admin" model="ir.rule">
+            <field name="name">Payslip: Admin absolute bypass</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_payslip"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
+        <record id="rule_travel_admin" model="ir.rule">
+            <field name="name">Travel: Admin absolute bypass</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_travel_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
+        <record id="rule_grievance_admin" model="ir.rule">
+            <field name="name">Grievance: Admin absolute bypass</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_grievance"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
+        <record id="rule_pip_admin" model="ir.rule">
+            <field name="name">PIP: Admin absolute bypass</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_pip"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
+        <!-- Performance Review record rules -->
+        <record id="rule_performance_review_own_employee" model="ir.rule">
+            <field name="name">Performance Review: Own reviews for ESS</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_performance_review"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_employee'))]"/>
+        </record>
+
+        <record id="rule_performance_review_all_management" model="ir.rule">
+            <field name="name">Performance Review: Global for Management and HR</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_performance_review"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_manager')), (4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_group_hr'))]"/>
+        </record>
+
+        <record id="rule_performance_review_company" model="ir.rule">
+            <field name="name">Performance Review: Company-based for HR</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_performance_review"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_auditor'))]"/>
+        </record>
+
+        <record id="rule_performance_review_admin" model="ir.rule">
+            <field name="name">Performance Review: Admin absolute bypass</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_performance_review"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+        </record>
+
+        <!-- Goal record rules -->
+        <record id="rule_vmf_goal_employee" model="ir.rule">
+            <field name="name">Goal: Own goals for employee</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_employee'))]"/>
+        </record>
+
+        <record id="rule_vmf_goal_manager" model="ir.rule">
+            <field name="name">Goal: Manager own and team goals (company restricted)</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), '|', '|', ('employee_id.user_id', '=', user.id), ('employee_id.parent_id.user_id', '=', user.id), ('employee_id.vmf_hod2_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_manager'))]"/>
+        </record>
+
+        <record id="rule_vmf_goal_hr" model="ir.rule">
+            <field name="name">Goal: Multi-company goals for HR and Auditor</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+            <field name="groups" eval="[(4, ref('group_vmf_hr_manager')), (4, ref('group_vmf_group_hr')), (4, ref('group_vmf_auditor'))]"/>
+        </record>
+
+        <record id="rule_vmf_goal_admin" model="ir.rule">
+            <field name="name">Goal: Admin absolute bypass</field>
+            <field name="model_id" ref="vmf_hrms.model_vmf_goal"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         </record>
     </data>
 </odoo>

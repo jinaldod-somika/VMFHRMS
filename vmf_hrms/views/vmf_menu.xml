@@ -10,18 +10,22 @@
               groups="vmf_hrms.group_vmf_hr_manager"/>
 
     <!-- Recruitment -->
-    <menuitem id="menu_vmf_recruitment" name="Recruitment" parent="menu_vmf_root" sequence="10" />
+    <menuitem id="menu_vmf_recruitment" name="Recruitment" parent="menu_vmf_root" sequence="10"
+              groups="vmf_hrms.group_vmf_recruiter,vmf_hrms.group_vmf_manager,vmf_hrms.group_vmf_hr_manager"/>
 
     <menuitem id="menu_vmf_mrf" name="Manpower Requisitions" parent="menu_vmf_recruitment"
-              action="action_vmf_mrf" sequence="1"/>
+              action="action_vmf_mrf" sequence="1" groups="vmf_hrms.group_vmf_recruiter,vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_manager"/>
     <menuitem id="menu_vmf_candidate" name="Candidates" parent="menu_vmf_recruitment"
-              action="action_vmf_candidate" sequence="2"/>
+              action="action_vmf_candidate" sequence="2"
+              groups="vmf_hrms.group_vmf_recruiter,vmf_hrms.group_vmf_hr_manager,vmf_hrms.group_vmf_manager"/>
 
     <!-- Employee -->
     <menuitem id="menu_vmf_employee" name="Employees" parent="menu_vmf_root" sequence="20"/>
 
     <menuitem id="menu_vmf_employee_list" name="All Employees" parent="menu_vmf_employee"
               action="hr.open_view_employee_list_my" sequence="1"/>
+
+    <menuitem id="om_hr_payroll.menu_hr_payroll_root" name="Payroll" sequence="186" web_icon="om_hr_payroll,static/description/icon.png" groups="vmf_hrms.group_vmf_payroll,vmf_hrms.group_vmf_hr_manager"/>
 
     <!-- Payroll -->
     <!-- <menuitem id="menu_vmf_payroll" name="Payroll" parent="menu_vmf_root" sequence="30"
@@ -46,13 +50,15 @@
               groups="vmf_hrms.group_vmf_travel_desk"/>
 
     <!-- Performance -->
-    <menuitem id="menu_vmf_performance" name="Performance" parent="menu_vmf_root" sequence="50"/>
+    <menuitem id="menu_vmf_performance" name="Performance" parent="menu_vmf_root" sequence="50"
+              groups="base.group_user"/>
 
-    <menuitem id="menu_vmf_goal_plan" name="Goal Plans" parent="menu_vmf_performance"
-              action="action_vmf_goal_plan" sequence="1"
-              groups="vmf_hrms.group_vmf_hr_manager"/>
-    <menuitem id="menu_vmf_performance_review" name="Performance Reviews" parent="menu_vmf_performance"
-              action="action_vmf_performance_review" sequence="2"/>
+    <menuitem id="menu_vmf_goal_plan" name="Goals" parent="menu_vmf_performance"
+              action="action_vmf_goal" sequence="1"
+              groups="base.group_user"/>
+    <!-- Legacy performance reviews menu hidden for now -->
+    <!-- <menuitem id="menu_vmf_performance_review" name="Performance Reviews" parent="menu_vmf_performance"
+              action="action_vmf_performance_review" sequence="2"/> -->
     <menuitem id="menu_vmf_pip" name="PIPs" parent="menu_vmf_performance"
               action="action_vmf_pip" sequence="3"
               groups="vmf_hrms.group_vmf_hr_manager"/>

@@ -93,6 +93,10 @@
                     </group>
                     <notebook>
                         <page string="Job Description">
+                            <group string="Job Description Document">
+                                <field name="jd_document" filename="jd_document_name"/>
+                                <field name="jd_document_name" invisible="1"/>
+                            </group>
                             <field name="justification" placeholder="Business justification for this requisition..."/>
                             <field name="job_description" widget="html"/>
                             <field name="skills_required" placeholder="Key skills required..."/>

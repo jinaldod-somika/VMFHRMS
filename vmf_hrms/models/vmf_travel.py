@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 from odoo.tools.translate import _
 from datetime import date
 
@@ -7,6 +8,7 @@ class VmfTravelAgent(models.Model):
     _name = 'vmf.travel.agent'
     _description = 'Travel Agent Master'
     _order = 'name'
+    _rec_names_search = ['name']
 
     name = fields.Char('Agent Name', required=True)
     contact_person = fields.Char('Contact Person')
@@ -27,6 +29,7 @@ class VmfTravelRequest(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
     _rec_name = 'name'
+    _rec_names_search = ['name'] # Travel Request No.
 
     name = fields.Char('Travel Request No.', readonly=True, copy=False, default='New')
     company_id = fields.Many2one('res.company', string='Company', required=True,
@@ -112,7 +115,8 @@ class VmfTravelRequest(models.Model):
 
     # Quotations
     quotation_ids = fields.One2many('vmf.travel.quotation', 'request_id', string='Agent Quotations')
-    selected_quotation_id = fields.Many2one('vmf.travel.quotation', string='Selected Quotation')
+    selected_quotation_id = fields.Many2one('vmf.travel.quotation', string='Selected Quotation',
+                                            domain="[('request_id', '=', id)]")
     booking_agent_id = fields.Many2one('vmf.travel.agent', related='selected_quotation_id.agent_id',
                                        store=True, string='Booking Agent')
     selection_justification = fields.Text('Selection Justification',
@@ -155,6 +159,24 @@ class VmfTravelRequest(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('vmf.travel.request') or 'New'
         return super().create(vals_list)
+
+    def write(self, vals):
+        restricted_fields = {
+            'ticket_number', 'pnr_number', 'airline', 'ticket_class', 'ticket_issue_date',
+            'dummy_ticket', 'dummy_ticket_pnr', 'international_cost', 'domestic_cost',
+            'seat_charges', 'employee_cost_share', 'currency_id'
+        }
+        for rec in self:
+            if rec.state in ['travelled', 'cancelled']:
+                if any(key != 'state' for key in vals.keys()):
+                    raise ValidationError(_("You cannot modify a travel request that is already in '%s' state.") % rec.state)
+            if restricted_fields.intersection(vals.keys()):
+                if not (self.env.user.has_group('vmf_hrms.group_vmf_travel_desk') or 
+                        self.env.user.has_group('vmf_hrms.group_vmf_hr_manager') or 
+                        self.env.is_admin() or 
+                        self.env.su):
+                    raise ValidationError(_("Only Travel Desk Co-ordinators or HR Managers can modify ticket and cost details."))
+        return super().write(vals)
 
     @api.depends('traveller_type', 'employee_id', 'family_member_name')
     def _compute_traveller_name(self):
@@ -201,6 +223,19 @@ class VmfTravelRequest(models.Model):
         self.message_post(body=_('Travel request sent to Travel Desk for booking.'))
 
     def action_book(self):
+        for rec in self:
+            if not rec.selected_quotation_id:
+                raise ValidationError(_("Selected Quotation is required before booking."))
+            if not rec.ticket_number:
+                raise ValidationError(_("Ticket Number / Reference is required before booking."))
+            if not rec.pnr_number:
+                raise ValidationError(_("PNR is required before booking."))
+            if not rec.airline:
+                raise ValidationError(_("Airline(s) is required before booking."))
+            if not rec.ticket_issue_date:
+                raise ValidationError(_("Ticket Issue Date is required before booking."))
+            if not rec.overall_cost or rec.overall_cost <= 0:
+                raise ValidationError(_("Overall Trip Cost must be greater than 0 before booking. Please ensure cost details are populated."))
         self.write({'state': 'booked'})
         self.message_post(body=_('Ticket booked. Details: %s') % (self.ticket_number or 'N/A'))
 
@@ -215,7 +250,9 @@ class VmfTravelQuotation(models.Model):
     _name = 'vmf.travel.quotation'
     _description = 'Travel Agent Quotation'
     _order = 'quoted_amount'
+    _rec_name = 'name'
 
+    name = fields.Char('Quotation No.', readonly=True, copy=False, default='New')
     request_id = fields.Many2one('vmf.travel.request', string='Travel Request', required=True, ondelete='cascade')
     agent_id = fields.Many2one('vmf.travel.agent', string='Travel Agent', required=True)
     quoted_amount = fields.Monetary('Quoted Amount', currency_field='currency_id', required=True)
@@ -230,6 +267,19 @@ class VmfTravelQuotation(models.Model):
     notes = fields.Text('Notes')
     is_lowest = fields.Boolean('Lowest Price', compute='_compute_is_lowest', store=True)
     is_selected = fields.Boolean('Selected', compute='_compute_is_selected', store=True)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                seq = self.env['ir.sequence'].next_by_code('vmf.travel.quotation') or 'New'
+                agent_name = ""
+                if vals.get('agent_id'):
+                    agent = self.env['vmf.travel.agent'].browse(vals['agent_id'])
+                    if agent:
+                        agent_name = f" - {agent.name}"
+                vals['name'] = f"{seq}{agent_name}"
+        return super().create(vals_list)
 
     @api.depends('request_id.quotation_ids.quoted_amount')
     def _compute_is_lowest(self):

@@ -177,3 +177,136 @@ class VmfCandidateReopenWizard(models.TransientModel):
         candidate.message_post(body=Markup(_('<b>Candidate Reopened</b><br/>'
                                              '<b>Notes:</b> %s')) % self.reopen_notes)
         return {'type': 'ir.actions.act_window_close'}
+
+
+class VmfCandidateInvitationWizard(models.TransientModel):
+    _name = 'vmf.candidate.invitation.wizard'
+    _description = 'Send Interview Invitation'
+
+    candidate_id = fields.Many2one('vmf.candidate', string='Candidate', required=True, readonly=True)
+    round_number = fields.Selection([
+        ('1', 'Round 1'),
+        ('2', 'Round 2'),
+        ('3', 'Round 3'),
+    ], string='Interview Round', required=True, readonly=True)
+    interview_date = fields.Date('Interview Date', required=True)
+    email = fields.Char('Candidate Email',
+                        help='Pre-filled from candidate record. You may update it here if missing or incorrect.')
+    interviewer_ids = fields.Many2many('hr.employee', string='Interviewers', required=True)
+    hr_interviewer_id = fields.Many2one('hr.employee', string='HR Interviewer', required=True)
+    google_meet_link = fields.Char('Google Meet / Invitation Link', help="Enter Google Meet or any other interview link details")
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super(VmfCandidateInvitationWizard, self).default_get(fields_list)
+        candidate_id = res.get('candidate_id') or self._context.get('default_candidate_id')
+        round_no = res.get('round_number') or self._context.get('default_round_number')
+
+        if candidate_id:
+            candidate = self.env['vmf.candidate'].browse(candidate_id)
+            # Pre-fill candidate email
+            if candidate.email:
+                res['email'] = candidate.email
+
+            if round_no:
+                # Default interviewers from previous round if Round 2 or 3
+                prev_round = str(int(round_no) - 1)
+                if prev_round in ['1', '2']:
+                    res.update({
+                        'interviewer_ids': [(6, 0, getattr(candidate, f'interview{prev_round}_interviewer_ids').ids)],
+                        'hr_interviewer_id': getattr(candidate, f'interview{prev_round}_hr_interviewer_id').id,
+                    })
+                
+                # Prefill Google Meet link for current round if it exists
+                current_meet_link = getattr(candidate, f'interview{round_no}_google_meet_link', False)
+                if current_meet_link:
+                    res['google_meet_link'] = current_meet_link
+        return res
+
+    def action_confirm_invitation(self):
+        self.ensure_one()
+        candidate = self.candidate_id
+        round_no = self.round_number
+
+        if not self.email:
+            raise UserError(_("Candidate email is required to send an interview invitation. Please enter the email address."))
+
+        # Save email back to candidate if it was added/corrected here
+        if self.email != candidate.email:
+            candidate.email = self.email
+
+        # Update candidate record
+        vals = {
+            f'interview{round_no}_date': self.interview_date,
+            f'interview{round_no}_interviewer_ids': [(6, 0, self.interviewer_ids.ids)],
+            f'interview{round_no}_hr_interviewer_id': self.hr_interviewer_id.id,
+            f'interview{round_no}_google_meet_link': self.google_meet_link,
+            'state': f'invitation_{round_no}'
+        }
+        candidate.write(vals)
+
+        # Prepare email template and send
+        template = self.env.ref(f'vmf_hrms.email_template_vmf_interview_{round_no}_invitation', raise_if_not_found=False)
+        if template:
+            # Add CC: Interviewers and HR Interviewer
+            cc_emails = []
+            for emp in self.interviewer_ids:
+                if emp.work_email:
+                    cc_emails.append(emp.work_email)
+            if self.hr_interviewer_id.work_email:
+                cc_emails.append(self.hr_interviewer_id.work_email)
+            
+            # Post message and send mail
+            email_values = {'email_cc': ','.join(cc_emails)} if cc_emails else {}
+            template.sudo().send_mail(candidate.id, force_send=True, email_values=email_values)
+
+        candidate.message_post(body=Markup(_('<b>%s Round Invitation Sent</b><br/>'
+                                             '<b>Date:</b> %s<br/>'
+                                             '<b>HR Interviewer:</b> %s<br/>'
+                                             '<b>Interviewers:</b> %s<br/>'
+                                             '<b>Google Meet Link:</b> %s')) % (
+            round_no, self.interview_date, self.hr_interviewer_id.name, ', '.join(self.interviewer_ids.mapped('name')),
+            self.google_meet_link or 'None'))
+            
+        return {'type': 'ir.actions.act_window_close'}
+
+
+class VmfCandidateFeedbackWizard(models.TransientModel):
+    _name = 'vmf.candidate.feedback.wizard'
+    _description = 'Interview Feedback Wizard'
+
+    candidate_id = fields.Many2one('vmf.candidate', string='Candidate', required=True, readonly=True)
+    round_number = fields.Selection([
+        ('1', 'Round 1'),
+        ('2', 'Round 2'),
+        ('3', 'Round 3'),
+    ], string='Interview Round', required=True, readonly=True)
+    result = fields.Selection([
+        ('cleared', 'Cleared'),
+        ('rejected', 'Rejected'),
+        ('result_pending', 'Result Pending'),
+        ('no_show', 'No Show'),
+    ], string='Result', required=True)
+    feedback = fields.Text('Feedback', required=True)
+    remarks = fields.Text('Remarks (Optional)')
+
+    def action_confirm_feedback(self):
+        self.ensure_one()
+        candidate = self.candidate_id
+        round_no = self.round_number
+
+        vals = {
+            f'interview{round_no}_result': self.result,
+            f'interview{round_no}_feedback': self.feedback,
+            f'interview{round_no}_remarks': self.remarks,
+        }
+        candidate.write(vals)
+
+        result_label = dict(self._fields['result'].selection).get(self.result)
+        candidate.message_post(body=Markup(_('<b>%s Feedback Submitted</b><br/>'
+                                             '<b>Result:</b> %s<br/>'
+                                             '<b>Feedback:</b> %s<br/>'
+                                             '<b>Remarks:</b> %s')) % (
+            round_no, result_label, self.feedback, self.remarks or 'N/A'))
+            
+        return {'type': 'ir.actions.act_window_close'}

@@ -63,6 +63,15 @@
         <field name="number_increment">1</field>
     </record>
 
+    <record id="seq_vmf_travel_quotation" model="ir.sequence">
+        <field name="name">Travel Agent Quotation</field>
+        <field name="code">vmf.travel.quotation</field>
+        <field name="prefix">TRQ/</field>
+        <field name="padding">5</field>
+        <field name="number_next">1</field>
+        <field name="number_increment">1</field>
+    </record>
+
     <record id="seq_vmf_exit_request" model="ir.sequence">
         <field name="name">Exit Request</field>
         <field name="code">vmf.exit.request</field>

@@ -9,6 +9,7 @@ class VmfCourse(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
     _order = 'name'
+    _rec_names_search = ['name', 'code']
 
     name = fields.Char('Course Name', required=True, tracking=True)
     code = fields.Char('Course Code', readonly=True, copy=False, default='New')
@@ -56,6 +57,10 @@ class VmfCourse(models.Model):
         'course_id', 'prereq_id', string='Pre-Requisite Courses')
     active = fields.Boolean('Active', default=True)
 
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name
+
     assignment_count = fields.Integer('Assignments', compute='_compute_assignment_count')
 
     @api.depends('code')
@@ -96,6 +101,7 @@ class VmfLearningPath(models.Model):
     _description = 'Learning Path'
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'name'
+    _rec_names_search = ['name', 'code']
 
     name = fields.Char('Learning Path Name', required=True, tracking=True)
     code = fields.Char('Path Code', readonly=True, copy=False, default='New')
@@ -118,6 +124,10 @@ class VmfLearningPath(models.Model):
     currency_id = fields.Many2one('res.currency', string='Currency',
         default=lambda self: self.env.company.currency_id)
     active = fields.Boolean('Active', default=True)
+
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name
 
     @api.depends('course_line_ids.course_id.duration_hours')
     def _compute_total_duration(self):

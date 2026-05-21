@@ -69,11 +69,16 @@ class VmfCostCenter(models.Model):
     _name = 'vmf.cost.center'
     _description = 'Cost Center'
     _order = 'code'
+    _rec_names_search = ['name', 'code']
 
     code = fields.Char('Cost Center Code', required=True, copy=False)
     name = fields.Char('Cost Center Name', required=True)
     company_id = fields.Many2one('res.company', string='Company')
     active = fields.Boolean('Active', default=True)
+
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name
 
     _sql_constraints = [
         ('code_company_uniq', 'unique(code, company_id)', 'Cost center code must be unique per company!'),
@@ -84,18 +89,28 @@ class VmfBusinessUnit(models.Model):
     _name = 'vmf.business.unit'
     _description = 'Business Unit'
     _order = 'name'
+    _rec_names_search = ['name', 'code']
 
     name = fields.Char('Business Unit Name', required=True)
     code = fields.Char('BU Code', copy=False)
     company_id = fields.Many2one('res.company', string='Company')
     active = fields.Boolean('Active', default=True)
 
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name
+
 
 class VmfRegion(models.Model):
     _name = 'vmf.region'
     _description = 'Region / Geography'
     _order = 'name'
+    _rec_names_search = ['name', 'code']
 
     name = fields.Char('Region Name', required=True)
     code = fields.Char('Region Code', copy=False)
     active = fields.Boolean('Active', default=True)
+
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.name} - {rec.code}" if rec.code else rec.name

@@ -81,41 +81,42 @@
                     </div>
                     <group>
                         <group string="Traveller">
-                            <field name="company_id"/>
-                            <field name="employee_id"/>
-                            <field name="traveller_type"/>
-                            <field name="family_member_name" invisible="traveller_type == 'employee'"/>
-                            <field name="relation" invisible="traveller_type == 'employee'"/>
+                            <field name="company_id" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="employee_id" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="traveller_type" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="family_member_name" invisible="traveller_type == 'employee'" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="relation" invisible="traveller_type == 'employee'" readonly="state in ['booked','travelled','cancelled']"/>
                         </group>
                         <group string="Trip Details">
-                            <field name="travel_purpose"/>
-                            <field name="flight_type"/>
-                            <field name="trip_type"/>
-                            <field name="expected_departure_date"/>
-                            <field name="expected_return_date" invisible="trip_type == 'one_way'"/>
+                            <field name="travel_purpose" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="flight_type" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="trip_type" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="expected_departure_date" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="expected_return_date" invisible="trip_type == 'one_way'" readonly="state in ['booked','travelled','cancelled']"/>
                         </group>
                     </group>
                     <group>
                         <group string="Route">
-                            <field name="origin_airport_id"/>
-                            <field name="via_airport_id"/>
-                            <field name="destination_airport_id"/>
+                            <field name="origin_airport_id" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="via_airport_id" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="destination_airport_id" readonly="state in ['booked','travelled','cancelled']"/>
                             <field name="route_description" readonly="1"/>
                         </group>
                         <group string="Visa / Passport" invisible="flight_type == 'domestic'">
                             <field name="passport_number" readonly="1"/>
                             <field name="passport_expiry" readonly="1"/>
-                            <field name="visa_type"/>
-                            <field name="visa_status"/>
-                            <field name="visa_application_date"/>
-                            <field name="visa_received_date"/>
+                            <field name="visa_type" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="visa_status" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="visa_application_date" readonly="state in ['booked','travelled','cancelled']"/>
+                            <field name="visa_received_date" readonly="state in ['booked','travelled','cancelled']"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Agent Quotations" groups="vmf_hrms.group_vmf_travel_desk">
-                            <field name="quotation_ids">
+                            <field name="quotation_ids" readonly="state in ['booked','travelled','cancelled']">
                                 <list editable="bottom" decoration-success="is_lowest == True"
                                       decoration-primary="is_selected == True">
+                                    <field name="name" readonly="1"/>
                                     <field name="agent_id"/>
                                     <field name="quoted_amount"/>
                                     <field name="currency_id" readonly="1"/>
@@ -128,39 +129,71 @@
                                 </list>
                             </field>
                             <group>
-                                <field name="selected_quotation_id"/>
-                                <field name="selection_justification"/>
+                                <field name="selected_quotation_id" readonly="state in ['booked','travelled','cancelled']"/>
+                                <field name="selection_justification" readonly="state in ['booked','travelled','cancelled']"/>
                             </group>
                         </page>
-                        <page string="Ticket Details" invisible="state not in ['booked','travelled']">
-                            <group>
+                        <page string="Ticket Details" invisible="state not in ['travel_desk','booked','travelled']">
+                            <!-- For Travel Desk & HR (Editable, but read-only in travelled/cancelled states) -->
+                            <group groups="vmf_hrms.group_vmf_travel_desk,vmf_hrms.group_vmf_hr_manager">
                                 <group>
-                                    <field name="ticket_number"/>
-                                    <field name="pnr_number"/>
-                                    <field name="airline"/>
-                                    <field name="ticket_class"/>
-                                    <field name="ticket_issue_date"/>
+                                    <field name="ticket_number" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="pnr_number" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="airline" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="ticket_class" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="ticket_issue_date" readonly="state in ['travelled','cancelled']"/>
                                 </group>
                                 <group>
-                                    <field name="dummy_ticket"/>
-                                    <field name="dummy_ticket_pnr" invisible="dummy_ticket == False"/>
-                                    <field name="actual_departure_date"/>
-                                    <field name="actual_return_date"/>
+                                    <field name="dummy_ticket" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="dummy_ticket_pnr" invisible="dummy_ticket == False" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="actual_departure_date" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="actual_return_date" readonly="state in ['travelled','cancelled']"/>
+                                </group>
+                            </group>
+                            <!-- For Employees / ESS Users (Always Read-Only) -->
+                            <group groups="!vmf_hrms.group_vmf_travel_desk,!vmf_hrms.group_vmf_hr_manager">
+                                <group>
+                                    <field name="ticket_number" readonly="1"/>
+                                    <field name="pnr_number" readonly="1"/>
+                                    <field name="airline" readonly="1"/>
+                                    <field name="ticket_class" readonly="1"/>
+                                    <field name="ticket_issue_date" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="dummy_ticket" readonly="1"/>
+                                    <field name="dummy_ticket_pnr" invisible="dummy_ticket == False" readonly="1"/>
+                                    <field name="actual_departure_date" readonly="1"/>
+                                    <field name="actual_return_date" readonly="1"/>
                                 </group>
                             </group>
                         </page>
-                        <page string="Cost">
-                            <group>
+                        <page string="Cost" invisible="state not in ['travel_desk','booked','travelled']">
+                            <!-- For Travel Desk & HR (Editable, but read-only in travelled/cancelled states) -->
+                            <group groups="vmf_hrms.group_vmf_travel_desk,vmf_hrms.group_vmf_hr_manager">
                                 <group>
-                                    <field name="international_cost"/>
-                                    <field name="domestic_cost"/>
-                                    <field name="seat_charges"/>
+                                    <field name="international_cost" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="domestic_cost" readonly="state in ['travelled','cancelled']"/>
+                                    <field name="seat_charges" readonly="state in ['travelled','cancelled']"/>
                                     <field name="overall_cost" readonly="1"/>
                                 </group>
                                 <group>
-                                    <field name="employee_cost_share"/>
+                                    <field name="employee_cost_share" readonly="state in ['travelled','cancelled']"/>
                                     <field name="company_cost_share" readonly="1"/>
-                                    <field name="currency_id"/>
+                                    <field name="currency_id" readonly="state in ['travelled','cancelled']"/>
+                                </group>
+                            </group>
+                            <!-- For Employees / ESS Users (Always Read-Only) -->
+                            <group groups="!vmf_hrms.group_vmf_travel_desk,!vmf_hrms.group_vmf_hr_manager">
+                                <group>
+                                    <field name="international_cost" readonly="1"/>
+                                    <field name="domestic_cost" readonly="1"/>
+                                    <field name="seat_charges" readonly="1"/>
+                                    <field name="overall_cost" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="employee_cost_share" readonly="1"/>
+                                    <field name="company_cost_share" readonly="1"/>
+                                    <field name="currency_id" readonly="1"/>
                                 </group>
                             </group>
                         </page>

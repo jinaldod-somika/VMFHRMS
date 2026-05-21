@@ -20,13 +20,11 @@
                     </group>
                     <field name="goal_ids">
                         <list editable="bottom">
-                            <field name="sequence"/>
                             <field name="name"/>
-                            <field name="category"/>
                             <field name="weight"/>
-                            <field name="target_value"/>
-                            <field name="target_unit"/>
-                            <field name="applicable_to"/>
+                            <field name="bsc_perspective"/>
+                            <field name="start_date"/>
+                            <field name="target_date"/>
                         </list>
                     </field>
                 </sheet>
@@ -216,5 +214,143 @@
         <field name="name">Performance Improvement Plans</field>
         <field name="res_model">vmf.pip</field>
         <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Goal Form View -->
+    <record id="view_vmf_goal_form" model="ir.ui.view">
+        <field name="name">vmf.goal.form</field>
+        <field name="model">vmf.goal</field>
+        <field name="arch" type="xml">
+            <form string="Goal Details">
+                <header>
+                    <button name="action_submit" string="Submit to HOD 1" type="object"
+                            invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_hod1_approve" string="Approve (HOD 1)" type="object"
+                            invisible="state != 'submitted'" class="btn-success"/>
+                    <button name="action_hod2_approve" string="Approve (HOD 2)" type="object"
+                            invisible="state != 'hod1_approved'" class="btn-success"/>
+                    <button name="action_reject" string="Reject / Need Info" type="object"
+                            invisible="state not in ['submitted', 'hod1_approved']" class="btn-danger"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state in ['achieved', 'cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,hod1_approved,achieved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. Expand Market Share in APAC" readonly="state != 'draft'"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Employee Info">
+                            <field name="employee_id" readonly="state != 'draft'"/>
+                            <field name="plan_id" readonly="state != 'draft'"/>
+                            <field name="manager_id" readonly="1"/>
+                            <field name="hod2_id" readonly="1"/>
+                        </group>
+                        <group string="Organization Info">
+                            <field name="company_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="job_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Goal Details">
+                            <group>
+                                <group>
+                                    <field name="weight" readonly="state != 'draft'"/>
+                                    <field name="bsc_perspective" readonly="state != 'draft'"/>
+                                    <field name="review_frequency" readonly="state != 'draft'"/>
+                                </group>
+                                <group>
+                                    <field name="start_date" readonly="state in ['achieved', 'cancelled']"/>
+                                    <field name="target_date" readonly="state in ['achieved', 'cancelled']"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="statement" readonly="state != 'draft'"/>
+                                <field name="success_measure" readonly="state != 'draft'"/>
+                                <field name="comments" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        <page string="Execution Steps">
+                            <group>
+                                <field name="milestone_not_sure" readonly="state != 'draft'"/>
+                            </group>
+                            <field name="milestone_ids" invisible="milestone_not_sure == True" readonly="state in ['achieved', 'cancelled']">
+                                <list editable="bottom">
+                                    <field name="measure" readonly="parent.state in ['achieved', 'cancelled']"/>
+                                    <field name="description" readonly="parent.state in ['achieved', 'cancelled']"/>
+                                    <field name="completion_date" readonly="parent.state in ['achieved', 'cancelled']"/>
+                                    <field name="hod1_comment" readonly="parent.state != 'submitted'"/>
+                                    <field name="hod2_comment" readonly="parent.state != 'hod1_approved'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Goal Tree View -->
+    <record id="view_vmf_goal_list" model="ir.ui.view">
+        <field name="name">vmf.goal.list</field>
+        <field name="model">vmf.goal</field>
+        <field name="arch" type="xml">
+            <list string="Goals">
+                <field name="name"/>
+                <field name="plan_id"/>
+                <field name="employee_id"/>
+                <field name="manager_id"/>
+                <field name="hod2_id"/>
+                <field name="weight"/>
+                <field name="bsc_perspective"/>
+                <field name="target_date"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'achieved'"
+                       decoration-info="state == 'submitted'"
+                       decoration-warning="state == 'hod1_approved'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Goal Search View -->
+    <record id="view_vmf_goal_search" model="ir.ui.view">
+        <field name="name">vmf.goal.search</field>
+        <field name="model">vmf.goal</field>
+        <field name="arch" type="xml">
+            <search string="Search Goals">
+                <field name="name" string="Goal Name"/>
+                <field name="employee_id"/>
+                <field name="manager_id"/>
+                <field name="hod2_id"/>
+                <filter string="My Goals" name="my_goals" domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter string="HOD 1 Approved" name="hod1_approved" domain="[('state', '=', 'hod1_approved')]"/>
+                <filter string="Achieved" name="achieved" domain="[('state', '=', 'achieved')]"/>
+                <separator/>
+                <filter string="By Employee" name="group_employee" context="{'group_by': 'employee_id'}"/>
+                <filter string="By Manager (HOD 1)" name="group_manager" context="{'group_by': 'manager_id'}"/>
+                <filter string="By Status" name="group_status" context="{'group_by': 'state'}"/>
+                <filter string="By BSC Perspective" name="group_bsc" context="{'group_by': 'bsc_perspective'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for standalone goals -->
+    <record id="action_vmf_goal" model="ir.actions.act_window">
+        <field name="name">Goals</field>
+        <field name="res_model">vmf.goal</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_vmf_goal_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new goal plan for professional or organizational achievements.
+            </p>
+        </field>
     </record>
 </odoo>

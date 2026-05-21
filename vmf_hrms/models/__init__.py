@@ -14,4 +14,6 @@ from . import vmf_learning
 from . import vmf_talent
 from . import res_partner_bank_ext
 # from . import hr_contract_ext
+from . import hr_employee_public_ext
+
 

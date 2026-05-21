@@ -1,4 +1,5 @@
 from odoo.tests.common import TransactionCase
+from odoo.exceptions import ValidationError
 from datetime import date, timedelta
 
 
@@ -134,8 +135,100 @@ class TestVmfTravel(TransactionCase):
         req.action_manager_approve()
         req.action_hr_approve()
         req.action_send_to_travel_desk()
-        req.write({'ticket_number': 'ET-001-TEST', 'pnr_number': 'PNR123'})
+        q = self.env['vmf.travel.quotation'].create({
+            'request_id': req.id,
+            'agent_id': self.agent1.id,
+            'quoted_amount': 500,
+            'ticket_class': 'economy',
+        })
+        req.write({
+            'selected_quotation_id': q.id,
+            'ticket_number': 'ET-001-TEST',
+            'pnr_number': 'PNR123',
+            'airline': 'Ethiopian Airlines',
+            'ticket_issue_date': date.today(),
+            'international_cost': 500,
+        })
         req.action_book()
         self.assertEqual(req.state, 'booked')
         req.action_mark_travelled()
         self.assertEqual(req.state, 'travelled')
+
+    def test_travel_quotation_sequence(self):
+        req = self._create_travel_request()
+        q = self.env['vmf.travel.quotation'].create({
+            'request_id': req.id,
+            'agent_id': self.agent1.id,
+            'quoted_amount': 1500,
+            'ticket_class': 'economy',
+        })
+        self.assertNotEqual(q.name, 'New')
+        self.assertIn('TRQ/', q.name)
+        self.assertIn(self.agent1.name, q.name)
+
+    def test_travel_booking_validations(self):
+        req = self._create_travel_request()
+        req.action_submit()
+        req.action_manager_approve()
+        req.action_hr_approve()
+        req.action_send_to_travel_desk()
+        
+        with self.assertRaises(ValidationError):
+            req.action_book()
+            
+        q = self.env['vmf.travel.quotation'].create({
+            'request_id': req.id,
+            'agent_id': self.agent1.id,
+            'quoted_amount': 500,
+            'ticket_class': 'economy',
+        })
+        req.write({
+            'selected_quotation_id': q.id,
+            'ticket_number': 'ET-001-TEST',
+            'pnr_number': 'PNR123',
+            'airline': 'Ethiopian Airlines',
+            'ticket_issue_date': date.today(),
+            'international_cost': 500,
+        })
+        req.action_book()
+        self.assertEqual(req.state, 'booked')
+
+    def test_travelled_state_readonly(self):
+        req = self._create_travel_request()
+        req.action_submit()
+        req.action_manager_approve()
+        req.action_hr_approve()
+        req.action_send_to_travel_desk()
+        q = self.env['vmf.travel.quotation'].create({
+            'request_id': req.id,
+            'agent_id': self.agent1.id,
+            'quoted_amount': 500,
+            'ticket_class': 'economy',
+        })
+        req.write({
+            'selected_quotation_id': q.id,
+            'ticket_number': 'ET-001-TEST',
+            'pnr_number': 'PNR123',
+            'airline': 'Ethiopian Airlines',
+            'ticket_issue_date': date.today(),
+            'international_cost': 500,
+        })
+        req.action_book()
+        req.action_mark_travelled()
+        self.assertEqual(req.state, 'travelled')
+        
+        with self.assertRaises(ValidationError):
+            req.write({'travel_purpose': 'business'})
+
+    def test_employee_fields_permissions(self):
+        req = self._create_travel_request()
+        ess_user = self.env['res.users'].create({
+            'name': 'ESS Test User',
+            'login': 'esstestuser',
+            'email': 'ess@example.com',
+            'group_ids': [(6, 0, [self.env.ref('vmf_hrms.group_vmf_employee').id])],
+        })
+        self.employee.user_id = ess_user.id
+        
+        with self.assertRaises(ValidationError):
+            req.with_user(ess_user).write({'ticket_number': 'REF-999'})

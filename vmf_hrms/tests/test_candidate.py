@@ -135,3 +135,27 @@ class TestVmfCandidate(TransactionCase):
         self.assertTrue(cand.employee_id)
         self.assertEqual(cand.employee_id.name, cand.candidate_name)
         self.assertEqual(result['res_model'], 'hr.employee')
+
+    def test_candidate_mrf_relations(self):
+        # Create a recruiter/coordinator
+        recruiter = self.env['hr.employee'].create({
+            'name': 'Test Recruiter',
+            'company_id': self.company.id,
+        })
+        self.mrf.coordinator_id = recruiter.id
+
+        # Create a candidate
+        cand = self._create_candidate()
+
+        # Verify that hiring manager and recruiter/coordinator are pulled from the MRF automatically on creation
+        self.assertEqual(cand.hiring_manager_id, self.manager_emp)
+        self.assertEqual(cand.coordinator_id, recruiter)
+
+        # Verify that they are editable (i.e. changing candidate recruiter doesn't change MRF recruiter)
+        other_recruiter = self.env['hr.employee'].create({
+            'name': 'Other Recruiter',
+            'company_id': self.company.id,
+        })
+        cand.coordinator_id = other_recruiter.id
+        self.assertEqual(cand.coordinator_id, other_recruiter)
+        self.assertEqual(self.mrf.coordinator_id, recruiter)

@@ -40,12 +40,14 @@ class VmfCandidate(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
     _rec_name = 'name'
+    _rec_names_search = ['name', 'candidate_name']
 
     name = fields.Char('Candidate UID', readonly=True, copy=False, default='New')
     candidate_name = fields.Char('Candidate Name', required=True, tracking=True)
     mobile = fields.Char('Mobile')
     email = fields.Char('Email')
-    mrf_id = fields.Many2one('vmf.mrf', string='Position (MRF)', required=True, tracking=True)
+    mrf_id = fields.Many2one('vmf.mrf', string='Position (MRF)', required=True, tracking=True,
+                             domain="[('state', 'in', ['budget_approved', 'in_progress'])]")
     company_id = fields.Many2one('res.company', related='mrf_id.company_id', store=True, string='Company')
     department_id = fields.Many2one('hr.department', related='mrf_id.department_id', store=True)
     job_id = fields.Many2one('hr.job', related='mrf_id.job_id', store=True, string='Applied For')
@@ -54,13 +56,17 @@ class VmfCandidate(models.Model):
     sourcing_channel = fields.Selection(SOURCING_CHANNELS, string='Sourcing Channel', tracking=True)
     sourcing_agency = fields.Char('Agency / Partner Name')
     resume_received_date = fields.Date('Resume Received Date', default=fields.Date.today)
-    coordinator_id = fields.Many2one('hr.employee', string='Coordinator / Recruiter')
+    coordinator_id = fields.Many2one('hr.employee', string='Coordinator / Recruiter', tracking=True)
+    hiring_manager_id = fields.Many2one('hr.employee', string='Hiring Manager', tracking=True)
 
     state = fields.Selection([
         ('new', 'New'),
         ('screening', 'Screening'),
+        ('invitation_1', '1st Round Invitation Sent'),
         ('interview_1', 'Interview Round 1'),
+        ('invitation_2', '2nd Round Invitation Sent'),
         ('interview_2', 'Interview Round 2'),
+        ('invitation_3', '3rd Round Invitation Sent'),
         ('interview_3', 'Interview Round 3'),
         ('assessment', 'Assessment'),
         ('selected', 'Selected'),
@@ -80,8 +86,11 @@ class VmfCandidate(models.Model):
     previous_state = fields.Selection([
         ('new', 'New'),
         ('screening', 'Screening'),
+        ('invitation_1', '1st Round Invitation Sent'),
         ('interview_1', 'Interview 1'),
+        ('invitation_2', '2nd Round Invitation Sent'),
         ('interview_2', 'Interview 2'),
+        ('invitation_3', '3rd Round Invitation Sent'),
         ('interview_3', 'Interview 3'),
         ('selected', 'Selected'),
         ('offer_prepared', 'Offer Prepared'),
@@ -101,18 +110,27 @@ class VmfCandidate(models.Model):
     # Interview rounds
     interview1_date = fields.Date('Round 1 Date')
     interview1_interviewer_ids = fields.Many2many('hr.employee', 'cand_int1_rel', 'cand_id', 'emp_id', string='Round 1 Interviewers')
+    interview1_hr_interviewer_id = fields.Many2one('hr.employee', string='Round 1 HR Interviewer')
+    interview1_google_meet_link = fields.Char('Round 1 Google Meet Link')
     interview1_result = fields.Selection(INTERVIEW_RESULTS, string='Round 1 Result')
     interview1_feedback = fields.Text('Round 1 Feedback')
+    interview1_remarks = fields.Text('Round 1 Remarks')
 
     interview2_date = fields.Date('Round 2 Date')
     interview2_interviewer_ids = fields.Many2many('hr.employee', 'cand_int2_rel', 'cand_id', 'emp_id', string='Round 2 Interviewers')
+    interview2_hr_interviewer_id = fields.Many2one('hr.employee', string='Round 2 HR Interviewer')
+    interview2_google_meet_link = fields.Char('Round 2 Google Meet Link')
     interview2_result = fields.Selection(INTERVIEW_RESULTS, string='Round 2 Result')
     interview2_feedback = fields.Text('Round 2 Feedback')
+    interview2_remarks = fields.Text('Round 2 Remarks')
 
     interview3_date = fields.Date('Round 3 Date')
     interview3_interviewer_ids = fields.Many2many('hr.employee', 'cand_int3_rel', 'cand_id', 'emp_id', string='Round 3 Interviewers')
+    interview3_hr_interviewer_id = fields.Many2one('hr.employee', string='Round 3 HR Interviewer')
+    interview3_google_meet_link = fields.Char('Round 3 Google Meet Link')
     interview3_result = fields.Selection(INTERVIEW_RESULTS, string='Round 3 Result')
     interview3_feedback = fields.Text('Round 3 Feedback')
+    interview3_remarks = fields.Text('Round 3 Remarks')
 
     # Assessment
     assessment_done = fields.Boolean('Assessment Done')
@@ -188,12 +206,29 @@ class VmfCandidate(models.Model):
     # Documents
     candidate_document_ids = fields.Many2many('ir.attachment', 'cand_doc_rel', 'cand_id', 'attach_id', string='Documents')
 
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = f"{rec.candidate_name} - {rec.name}" if rec.name else rec.candidate_name
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('vmf.candidate') or 'New'
+            if vals.get('mrf_id'):
+                mrf = self.env['vmf.mrf'].browse(vals['mrf_id'])
+                if mrf:
+                    if not vals.get('hiring_manager_id'):
+                        vals['hiring_manager_id'] = mrf.hiring_manager_id.id
+                    if not vals.get('coordinator_id'):
+                        vals['coordinator_id'] = mrf.coordinator_id.id
         return super().create(vals_list)
+
+    @api.onchange('mrf_id')
+    def _onchange_mrf_id_populate_recruitment_team(self):
+        if self.mrf_id:
+            self.hiring_manager_id = self.mrf_id.hiring_manager_id
+            self.coordinator_id = self.mrf_id.coordinator_id
 
     @api.depends('drop_ids')
     def _compute_is_dropped(self):
@@ -212,17 +247,60 @@ class VmfCandidate(models.Model):
     def action_move_to_screening(self):
         self.write({'state': 'screening'})
 
+    def action_open_invitation_wizard(self):
+        self.ensure_one()
+        round_map = {
+            'screening': '1',
+            'interview_1': '2',
+            'interview_2': '3',
+        }
+        round_no = round_map.get(self.state)
+        if not round_no:
+            return False
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Send Interview Invitation'),
+            'res_model': 'vmf.candidate.invitation.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_candidate_id': self.id,
+                'default_round_number': round_no,
+            }
+        }
+
+    def action_open_feedback_wizard(self):
+        self.ensure_one()
+        round_map = {
+            'interview_1': '1',
+            'interview_2': '2',
+            'interview_3': '3',
+        }
+        round_no = round_map.get(self.state)
+        if not round_no:
+            return False
+        
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Interview Feedback'),
+            'res_model': 'vmf.candidate.feedback.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_candidate_id': self.id,
+                'default_round_number': round_no,
+            }
+        }
+
     def action_schedule_interview1(self):
         self.write({'state': 'interview_1'})
-        return self._action_open_calendar_event(_('Round 1 Interview'))
 
     def action_schedule_interview2(self):
         self.write({'state': 'interview_2'})
-        return self._action_open_calendar_event(_('Round 2 Interview'))
 
     def action_schedule_interview3(self):
         self.write({'state': 'interview_3'})
-        return self._action_open_calendar_event(_('Round 3 Interview'))
 
     def _action_open_calendar_event(self, meeting_name):
         self.ensure_one()

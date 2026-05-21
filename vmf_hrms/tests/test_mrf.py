@@ -111,3 +111,22 @@ class TestVmfMRF(TransactionCase):
         mrf = self._create_mrf(no_of_positions=3)
         self.assertEqual(mrf.open_positions, 3)
         self.assertEqual(mrf.filled_positions, 0)
+
+    def test_mrf_grade_from_job_onchange(self):
+        self.job.grade_id = self.grade.id
+        mrf = self.env['vmf.mrf'].new({
+            'job_id': self.job.id,
+        })
+        mrf._onchange_job_id()
+        self.assertEqual(mrf.grade_id.id, self.grade.id, "Grade should be automatically set from Job Position")
+
+    def test_mrf_jd_document(self):
+        import base64
+        dummy_content = base64.b64encode(b"Dummy Job Description File Content")
+        mrf = self._create_mrf(
+            jd_document=dummy_content,
+            jd_document_name='software_engineer_jd.pdf'
+        )
+        self.assertEqual(mrf.jd_document, dummy_content, "JD Document data should match the saved content")
+        self.assertEqual(mrf.jd_document_name, 'software_engineer_jd.pdf', "JD Document Name should match")
+

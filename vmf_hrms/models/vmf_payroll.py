@@ -7,6 +7,7 @@ class VmfSalaryStructure(models.Model):
     _name = 'vmf.salary.structure'
     _description = 'Salary Structure'
     _order = 'name'
+    _rec_names_search = ['name', 'code']
 
     name = fields.Char('Structure Name', required=True)
     code = fields.Char('Code', required=True, copy=False)
@@ -35,6 +36,7 @@ class VmfSalaryRule(models.Model):
     structure_id = fields.Many2one('vmf.salary.structure', string='Structure', required=True, ondelete='cascade')
     sequence = fields.Integer('Sequence', default=10)
     name = fields.Char('Component Name', required=True)
+    _rec_names_search = ['name', 'code']
     code = fields.Char('Code', required=True, copy=False)
     component_type = fields.Selection([
         ('earning', 'Earning'),

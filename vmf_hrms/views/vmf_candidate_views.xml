@@ -8,12 +8,23 @@
                 <header>
                     <button name="action_move_to_screening" string="Screening" type="object"
                             invisible="state != 'new'" class="btn-primary"/>
-                    <button name="action_schedule_interview1" string="Round 1" type="object"
-                            invisible="state != 'screening'"/>
-                    <button name="action_schedule_interview2" string="Round 2" type="object"
-                            invisible="state != 'interview_1'"/>
-                    <button name="action_schedule_interview3" string="Round 3" type="object"
-                            invisible="state != 'interview_2'"/>
+                    <button name="action_open_invitation_wizard" string="1st Round Invitation" type="object"
+                            invisible="state != 'screening'" class="btn-primary"/>
+                    <button name="action_schedule_interview1" string="Move to 1st Round" type="object"
+                            invisible="state != 'invitation_1'" class="btn-primary"/>
+                    
+                    <button name="action_open_invitation_wizard" string="2nd Round Invitation" type="object"
+                            invisible="state != 'interview_1' or interview1_result != 'cleared'"/>
+                    <button name="action_schedule_interview2" string="Move to 2nd Round" type="object"
+                            invisible="state != 'invitation_2'"/>
+
+                    <button name="action_open_invitation_wizard" string="3rd Round Invitation" type="object"
+                            invisible="state != 'interview_2' or interview2_result != 'cleared'"/>
+                    <button name="action_schedule_interview3" string="Move to 3rd Round" type="object"
+                            invisible="state != 'invitation_3'"/>
+
+                    <button name="action_open_feedback_wizard" string="Submit Feedback" type="object"
+                            invisible="state not in ['interview_1','interview_2','interview_3']" class="btn-info"/>
                     <button name="action_select" string="Select Candidate" type="object"
                             invisible="state not in ['interview_1','interview_2','interview_3','assessment']"
                             class="btn-success"/>
@@ -52,7 +63,7 @@
                     <button name="action_print_offer_letter" string="Print Offer Letter" type="object"
                             invisible="state not in ['offer_prepared','offer_released','offer_accepted']"/>
                     <field name="state" widget="statusbar"
-                           statusbar_visible="new,screening,interview_1,selected,offer_released,offer_accepted,bgv,joining_confirmed,joined"/>
+                           statusbar_visible="new,screening,interview_1,interview_2,interview_3,selected,offer_released,offer_accepted,bgv,joining_confirmed,joined"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -70,6 +81,7 @@
                             <field name="job_id" readonly="1"/>
                             <field name="grade_id" readonly="1"/>
                             <field name="coordinator_id"/>
+                            <field name="hiring_manager_id"/>
                         </group>
                     </group>
                     <group>
@@ -91,30 +103,39 @@
                                 <group>
                                     <field name="interview1_date"/>
                                     <field name="interview1_interviewer_ids" widget="many2many_tags"/>
+                                    <field name="interview1_hr_interviewer_id"/>
+                                    <field name="interview1_google_meet_link" widget="url"/>
                                 </group>
                                 <group>
                                     <field name="interview1_result"/>
                                     <field name="interview1_feedback"/>
+                                    <field name="interview1_remarks"/>
                                 </group>
                             </group>
                             <group string="Round 2">
                                 <group>
                                     <field name="interview2_date"/>
                                     <field name="interview2_interviewer_ids" widget="many2many_tags"/>
+                                    <field name="interview2_hr_interviewer_id"/>
+                                    <field name="interview2_google_meet_link" widget="url"/>
                                 </group>
                                 <group>
                                     <field name="interview2_result"/>
                                     <field name="interview2_feedback"/>
+                                    <field name="interview2_remarks"/>
                                 </group>
                             </group>
                             <group string="Round 3">
                                 <group>
                                     <field name="interview3_date"/>
                                     <field name="interview3_interviewer_ids" widget="many2many_tags"/>
+                                    <field name="interview3_hr_interviewer_id"/>
+                                    <field name="interview3_google_meet_link" widget="url"/>
                                 </group>
                                 <group>
                                     <field name="interview3_result"/>
                                     <field name="interview3_feedback"/>
+                                    <field name="interview3_remarks"/>
                                 </group>
                             </group>
                             <group string="Assessment">
@@ -228,9 +249,11 @@
                 <field name="drop_reason"/>
                 <field name="state" widget="badge"
                        decoration-success="state == 'joined'"
-                       decoration-warning="state in ['offer_released','offer_accepted','bgv','visa']"
+                       decoration-warning="state in ['offer_released','offer_accepted','bgv','visa','invitation_1','invitation_2','invitation_3']"
+                       decoration-info="state in ['interview_1','interview_2','interview_3']"
                        decoration-danger="state in ['offer_dropped','rejected']"/>
                 <field name="coordinator_id"/>
+                <field name="hiring_manager_id"/>
                 <field name="tat_days"/>
             </list>
         </field>
@@ -269,6 +292,7 @@
                 <field name="mrf_id"/>
                 <field name="company_id"/>
                 <field name="coordinator_id"/>
+                <field name="hiring_manager_id"/>
                 <filter string="Joined" name="joined" domain="[('state','=','joined')]"/>
                 <filter string="In Pipeline" name="pipeline" domain="[('state','not in',['joined','offer_dropped','rejected'])]"/>
                 <filter string="Offer Released" name="offer_released" domain="[('state','=','offer_released')]"/>
@@ -277,6 +301,8 @@
                     <filter string="Position" name="by_mrf" context="{'group_by': 'mrf_id'}"/>
                     <filter string="Stage" name="by_state" context="{'group_by': 'state'}"/>
                     <filter string="Source" name="by_channel" context="{'group_by': 'sourcing_channel'}"/>
+                    <filter string="Recruiter" name="by_coordinator" context="{'group_by': 'coordinator_id'}"/>
+                    <filter string="Hiring Manager" name="by_hiring_manager" context="{'group_by': 'hiring_manager_id'}"/>
                 </group>
             </search>
         </field>
